@@ -171,6 +171,8 @@ foreach ($ip in $GhPagesIPv6) { Write-Host "    AAAA   @      $ip" }
 Write-Host "    CNAME  www    $login.github.io"
 Write-Host ''
 Write-Note 'Delete the existing parking A records first (Wix parks on 185.230.63.x).'
+Write-Note 'At Wix, leave the Host name field BLANK for @ - it appends the domain'
+Write-Note 'for you, so typing @ produces the invalid @.yourdomain.com.'
 Write-Note 'On Wix the "www" host is reserved, so that CNAME may be rejected -'
 Write-Note 'the apex A records alone are enough for the site to work.'
 Write-Host ''

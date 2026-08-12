@@ -204,8 +204,12 @@ Apex `aakashxyz.com` needs four `A` records and four `AAAA` records:
 3. In the **A (Host)** section, **delete the three parked records** pointing at
    `185.230.63.107`, `185.230.63.171` and `185.230.63.186`. Those are Wix's
    parking page.
-4. Add **four A records**, each with host name `@`, one per IP in the table above.
-5. Optionally add the **four AAAA records** (also host `@`) for IPv6 visitors.
+4. Add **four A records**, one per IP in the table above. **Leave the Host name
+   field blank** — Wix appends `.aakashxyz.com` to whatever you type, so `@`
+   becomes the invalid `@.aakashxyz.com` and is rejected. Blank means the root
+   domain. (Wix's docs: *"If you're instructed to create a DNS record with the
+   @ sign in the Host Name field, leave the Host Name field blank instead."*)
+5. Optionally add the **four AAAA records** (also blank host) for IPv6 visitors.
 6. **Skip the `www` CNAME** — Wix reserves that host and will reject it with
    *"Hostname already in use"*. Apex-only works fine.
 7. Set the lowest TTL Wix offers so it propagates quickly, then **Save**.
