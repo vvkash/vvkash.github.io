@@ -4,12 +4,19 @@
 
 .DESCRIPTION
   Creates the GitHub repo, pushes this project, turns on Pages with the
-  GitHub Actions source, pins the custom domain, waits for the first deploy,
-  checks DNS, and enables HTTPS enforcement once the certificate is ready.
+  GitHub Actions source, and waits for the first deploy. The site is then
+  live at https://<you>.github.io straight away.
 
-  The only thing this cannot do is add the DNS records - those live at your
-  domain registrar. The script prints exactly what to enter and then waits
-  for them to resolve.
+  The custom domain is attached ONLY after DNS actually points at GitHub.
+  That ordering matters: a user Pages site (<you>.github.io) 301-redirects to
+  its custom domain as soon as one is set, so setting the domain while DNS
+  still points somewhere else takes the whole site offline.
+
+  The one thing this cannot do is add the DNS records - those live at your
+  registrar. The script prints exactly what to enter, waits for them to
+  resolve, then attaches the domain and turns on HTTPS.
+
+  Safe to re-run. Run it once now to go live, and again after DNS is set.
 
 .EXAMPLE
   .\scripts\setup-pages.ps1
@@ -120,13 +127,7 @@ if ($script:GhExit -ne 0) {
 }
 Write-Ok 'Pages source set to GitHub Actions'
 
-# --- 5. custom domain -------------------------------------------------------
-Write-Step "Setting custom domain to $Domain"
-$out = Invoke-Gh api -X PUT "repos/$slug/pages" -f "cname=$Domain"
-if ($script:GhExit -ne 0) { Write-Note "Could not set the domain yet: $out" }
-else { Write-Ok "custom domain: $Domain" }
-
-# --- 6. first deploy --------------------------------------------------------
+# --- 5. first deploy --------------------------------------------------------
 Write-Step 'Waiting for the first deploy'
 $run = $null
 $state = ''
@@ -149,8 +150,17 @@ else {
   Write-Note "Deploy still running. Watch it with:  gh run watch --repo $slug"
 }
 
-# --- 7. DNS -----------------------------------------------------------------
-Write-Step "DNS records to add at your registrar for $Domain"
+$isUserPage = ($RepoName -eq "$login.github.io")
+$liveUrl = if ($isUserPage) { "https://$login.github.io" } else { "https://$login.github.io/$RepoName/" }
+Write-Host ''
+Write-Ok "your site is live at $liveUrl"
+if (-not $isUserPage) {
+  Write-Note "This is a project page served from a subfolder. vite.config.ts uses base '/',"
+  Write-Note "so assets will 404 until the custom domain is attached."
+}
+
+# --- 6. DNS -----------------------------------------------------------------
+Write-Step "DNS records to set at your registrar for $Domain"
 Write-Host ''
 Write-Host '    Type   Name   Value' -ForegroundColor White
 Write-Host '    ----   ----   -----' -ForegroundColor DarkGray
@@ -158,9 +168,14 @@ foreach ($ip in $GhPagesIPv4) { Write-Host "    A      @      $ip" }
 foreach ($ip in $GhPagesIPv6) { Write-Host "    AAAA   @      $ip" }
 Write-Host "    CNAME  www    $login.github.io"
 Write-Host ''
+Write-Note 'Delete the existing parking A records first (Wix parks on 185.230.63.x).'
+Write-Note 'On Wix the "www" host is reserved, so that CNAME may be rejected -'
+Write-Note 'the apex A records alone are enough for the site to work.'
+Write-Host ''
 
 if ($SkipDnsWait) {
-  Write-Note 'Skipping the DNS check (-SkipDnsWait). Re-run later to finish HTTPS.'
+  Write-Note 'Skipping the DNS check (-SkipDnsWait). Re-run later to attach the domain.'
+  Write-Host "`nDone for now.  $liveUrl`n" -ForegroundColor Green
   return
 }
 
@@ -183,10 +198,20 @@ do {
 } while ((Get-Date) -lt $deadline)
 
 if (-not $dnsOk) {
-  Write-Note 'DNS has not propagated yet. Re-run this script later to finish HTTPS.'
+  Write-Note 'DNS has not propagated yet, so the custom domain was NOT attached.'
+  Write-Note "That is deliberate - attaching it now would redirect $liveUrl to a"
+  Write-Note 'domain that does not point here yet, taking the site offline.'
+  Write-Note 'Add the records above, then just re-run this script.'
+  Write-Host "`nStill live at $liveUrl`n" -ForegroundColor Green
   return
 }
 Write-Ok "$Domain resolves to GitHub Pages"
+
+# --- 7. attach the custom domain --------------------------------------------
+Write-Step "Attaching custom domain $Domain"
+$out = Invoke-Gh api -X PUT "repos/$slug/pages" -f "cname=$Domain"
+if ($script:GhExit -ne 0) { throw "Could not set the custom domain:`n$out" }
+Write-Ok "custom domain: $Domain"
 
 # --- 8. HTTPS ---------------------------------------------------------------
 Write-Step 'Enabling HTTPS enforcement (waits for the certificate)'

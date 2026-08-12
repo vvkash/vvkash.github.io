@@ -94,23 +94,39 @@ the `theme` command automatically and persists in `localStorage`.
 
 That script signs you in (browser flow — no password is typed into the
 terminal), creates the repo, pushes, enables Pages with the GitHub Actions
-source, pins the custom domain, waits for the first deploy, prints the DNS
-records, waits for them to resolve, then turns on HTTPS enforcement.
+source, and waits for the first deploy. Your site is then **live immediately at
+`https://<your-username>.github.io`** — the custom domain is not required to
+get online.
 
-It is safe to re-run: it detects an existing repo and picks up where it left
-off. Needs [GitHub CLI](https://cli.github.com) (`winget install --id GitHub.cli`).
+It then prints the DNS records and waits for them to resolve. **The custom
+domain is attached only once DNS actually points at GitHub.** That ordering is
+deliberate: a user Pages site 301-redirects to its custom domain the moment one
+is set, so attaching `aakashxyz.com` while it still points at Wix would take the
+site offline. If DNS isn't ready the script says so and leaves the site up.
+
+So the normal flow is: run it once now to go live, add the DNS records, then
+re-run it to attach the domain and turn on HTTPS. It's safe to re-run at any
+point. Needs [GitHub CLI](https://cli.github.com) (`winget install --id GitHub.cli`).
 
 ### Or by hand
 
 The workflow ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml))
 builds and publishes on every push to `main`.
 
-1. Push this repo to GitHub.
+1. Push this repo to GitHub. Name it `<your-username>.github.io` so it serves
+   from the root — a project repo serves from `/<repo>/` and would need
+   `base` changed in `vite.config.ts`.
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions.**
-3. **Settings → Pages → Custom domain:** enter `aakashxyz.com` and save.
-   (`public/CNAME` already pins the domain so it survives redeploys.)
-4. Add the DNS records below.
-5. Once they resolve, tick **Enforce HTTPS**.
+3. Add the DNS records below and wait for them to resolve.
+4. **Only then** — **Settings → Pages → Custom domain:** enter `aakashxyz.com`
+   and save. Doing this before DNS resolves takes the site offline, because
+   `<your-username>.github.io` starts redirecting to a domain that doesn't
+   point at GitHub yet.
+5. Once GitHub has issued the certificate, tick **Enforce HTTPS**.
+
+> There's no `CNAME` file in this repo on purpose. When you publish with a
+> GitHub Actions workflow, GitHub ignores `CNAME` and reads the custom domain
+> from the repo settings instead.
 
 ### DNS records
 
@@ -126,18 +142,30 @@ Apex `aakashxyz.com` needs four `A` records and four `AAAA` records:
 | AAAA   | `@`   | 2606:50c0:8001::153         |
 | AAAA   | `@`   | 2606:50c0:8002::153         |
 | AAAA   | `@`   | 2606:50c0:8003::153         |
-| CNAME  | `www` | `<your-username>.github.io` |
+| CNAME  | `www` | `<your-username>.github.io` (skip on Wix — see below) |
 
-> **This domain is currently on Wix DNS** (`ns6.wixdns.net` / `ns7.wixdns.net`,
-> resolving to Wix's parking IPs `185.230.63.x`). Two ways to change that:
+> **⚠️ First: verify the domain contact email.** Wix sent a verification link to
+> the registrant address. If it isn't clicked before the deadline in the Wix
+> warning banner, **ICANN requires the domain to be suspended** — it stops
+> resolving entirely and nothing below will work. Check that inbox (and spam),
+> or hit *Resend Verification Email* in the Wix domain panel. Do this first.
 >
-> - **Edit records at Wix** — Wix dashboard → *Domains* → `aakashxyz.com` →
->   *DNS Records*. If the domain is attached to a Wix site, disconnect it first,
->   otherwise Wix locks the apex `A` records.
-> - **Move DNS to Cloudflare** (free, recommended) — add the domain at
->   Cloudflare, copy in the records above, then change the nameservers at Wix to
->   the two Cloudflare gives you. Set the records to **DNS only** (grey cloud)
->   until GitHub has issued the certificate, then you can proxy them.
+> **This domain is registered at Wix** and currently uses Wix DNS
+> (`ns6.wixdns.net` / `ns7.wixdns.net`, parked on `185.230.63.x`).
+>
+> - **Edit the records at Wix** — dashboard → *Domains* → `aakashxyz.com` →
+>   *DNS Records*. The domain shows as **Unassigned** (not attached to any Wix
+>   site), which is exactly the state where Wix lets you edit DNS. Delete the
+>   three parked `185.230.63.x` `A` records and add the ones above.
+> - **Skip the `www` CNAME.** Wix reserves the `www` host for connecting a Wix
+>   site, so it'll reject that record with *"Hostname already in use"*. The apex
+>   `A` records alone are enough — the site works fine at `aakashxyz.com`.
+> - **Cloudflare DNS isn't an option yet.** Wix doesn't allow pointing a
+>   Wix-registered domain at third-party nameservers, and the domain is under
+>   the ICANN 60-day post-registration transfer lock (Wix shows *"available for
+>   transfer on Oct 11, 2026"*), so it can't move registrars until then.
+>   That lock only blocks *registrar transfers* — editing DNS records at Wix
+>   works normally in the meantime, which is all GitHub Pages needs.
 
 Verify with `Resolve-DnsName aakashxyz.com -Type A` (or `dig aakashxyz.com`).
 Propagation is usually minutes, occasionally up to 24h.
@@ -150,5 +178,5 @@ Propagation is usually minutes, occasionally up to 24h.
 
 Any of them work with zero config — import the repo, they'll detect Vite
 (build `npm run build`, output `dist`), then add `aakashxyz.com` as a custom
-domain and follow their DNS instructions. If you go this route, delete
-`public/CNAME`.
+domain and follow their DNS instructions. You'd still add the records in the
+Wix DNS panel, and the same "verify your contact email first" warning applies.
