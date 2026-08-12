@@ -90,12 +90,26 @@ the `theme` command automatically and persists in `localStorage`.
 
 ```powershell
 cd C:\Users\t-aakashshah\aakashxyz
-.\scripts\setup-pages.ps1
+.\scripts\setup.cmd
 ```
 
 It prints a one-time code (like `A1B2-C3D4`) and opens your browser. Sign in
 with your **personal** GitHub account, paste the code, and approve the `repo`
 and `workflow` scopes.
+
+> **Why `.cmd` and not the `.ps1` directly?** Windows PowerShell 5.1 ships with
+> execution policy `Restricted`, so `.\scripts\setup-pages.ps1` fails with
+> *"running scripts is disabled on this system"*. Execution policy doesn't apply
+> to `.cmd` files, so the wrapper always works and changes no machine setting.
+> It prefers PowerShell 7 and falls back to Windows PowerShell. All arguments
+> pass straight through, e.g. `.\scripts\setup.cmd -Private`.
+>
+> If you'd rather run the `.ps1` directly, either use PowerShell 7 (`pwsh`),
+> or allow local scripts for your user once — no admin needed:
+>
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+> ```
 
 That script signs you in (browser flow — no password is typed into the
 terminal), creates the repo, pushes, enables Pages with the GitHub Actions
@@ -195,7 +209,7 @@ Resolve-DnsName aakashxyz.com -Type A | Select-Object IPAddress
 ```
 
 Once that returns the `185.199.x` addresses instead of `185.230.x`, re-run
-`.\scripts\setup-pages.ps1` — it detects the change, attaches the domain, and
+`.\scripts\setup.cmd` — it detects the change, attaches the domain, and
 turns on HTTPS.
 
 Propagation is usually minutes, occasionally up to 24h.
