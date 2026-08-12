@@ -89,8 +89,13 @@ the `theme` command automatically and persists in `localStorage`.
 ### The quick way
 
 ```powershell
+cd C:\Users\t-aakashshah\aakashxyz
 .\scripts\setup-pages.ps1
 ```
+
+It prints a one-time code (like `A1B2-C3D4`) and opens your browser. Sign in
+with your **personal** GitHub account, paste the code, and approve the `repo`
+and `workflow` scopes.
 
 That script signs you in (browser flow — no password is typed into the
 terminal), creates the repo, pushes, enables Pages with the GitHub Actions
@@ -167,7 +172,32 @@ Apex `aakashxyz.com` needs four `A` records and four `AAAA` records:
 >   That lock only blocks *registrar transfers* — editing DNS records at Wix
 >   works normally in the meantime, which is all GitHub Pages needs.
 
-Verify with `Resolve-DnsName aakashxyz.com -Type A` (or `dig aakashxyz.com`).
+### Step by step at Wix
+
+1. Go to **<https://www.wix.com/my-account/domains>**.
+2. Click **`aakashxyz.com`** → **Manage DNS Records** (under *Advanced*, or the
+   `⋯` menu next to the domain).
+3. In the **A (Host)** section, **delete the three parked records** pointing at
+   `185.230.63.107`, `185.230.63.171` and `185.230.63.186`. Those are Wix's
+   parking page.
+4. Add **four A records**, each with host name `@`, one per IP in the table above.
+5. Optionally add the **four AAAA records** (also host `@`) for IPv6 visitors.
+6. **Skip the `www` CNAME** — Wix reserves that host and will reject it with
+   *"Hostname already in use"*. Apex-only works fine.
+7. Set the lowest TTL Wix offers so it propagates quickly, then **Save**.
+   Accept any "this may affect your site" warning — the domain isn't attached
+   to a Wix site, so there's nothing to break.
+
+Check it took effect:
+
+```powershell
+Resolve-DnsName aakashxyz.com -Type A | Select-Object IPAddress
+```
+
+Once that returns the `185.199.x` addresses instead of `185.230.x`, re-run
+`.\scripts\setup-pages.ps1` — it detects the change, attaches the domain, and
+turns on HTTPS.
+
 Propagation is usually minutes, occasionally up to 24h.
 
 > Worth adding while you're in the DNS panel: a null MX and an SPF record so

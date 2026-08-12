@@ -152,8 +152,10 @@ else {
 
 $isUserPage = ($RepoName -eq "$login.github.io")
 $liveUrl = if ($isUserPage) { "https://$login.github.io" } else { "https://$login.github.io/$RepoName/" }
+$deployed = ($state -eq 'completed' -and $run -and $run.conclusion -eq 'success')
 Write-Host ''
-Write-Ok "your site is live at $liveUrl"
+if ($deployed) { Write-Ok "your site is live at $liveUrl" }
+else { Write-Note "once the deploy finishes your site will be at $liveUrl" }
 if (-not $isUserPage) {
   Write-Note "This is a project page served from a subfolder. vite.config.ts uses base '/',"
   Write-Note "so assets will 404 until the custom domain is attached."
