@@ -127,6 +127,16 @@ So the normal flow is: run it once now to go live, add the DNS records, then
 re-run it to attach the domain and turn on HTTPS. It's safe to re-run at any
 point. Needs [GitHub CLI](https://cli.github.com) (`winget install --id GitHub.cli`).
 
+### Check whether it worked
+
+```powershell
+.\scripts\verify.cmd
+```
+
+Read-only — changes nothing. It reports sign-in, remote, repo, Pages config,
+the last workflow run, whether the URLs actually respond, and where DNS
+currently points, marking each line `[ok]`, `[pending]` or `[no]`.
+
 ### Or by hand
 
 The workflow ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml))
