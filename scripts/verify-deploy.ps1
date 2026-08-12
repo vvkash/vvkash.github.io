@@ -102,7 +102,7 @@ else {
 }
 
 # 5. last workflow run
-$json = Invoke-Gh run list --repo $slug --limit 1 --json status,conclusion,url
+$json = Invoke-Gh run list --repo $slug --limit 1 --json 'status,conclusion,url'
 if ($script:GhExit -eq 0 -and $json -and $json.Trim() -ne '[]') {
   $run = ($json | ConvertFrom-Json)[0]
   if ($run.status -ne 'completed') { Write-Wait "deploy in progress ($($run.status)) - $($run.url)" }

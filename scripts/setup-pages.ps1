@@ -134,7 +134,7 @@ $state = ''
 $deadline = (Get-Date).AddMinutes(8)
 do {
   Start-Sleep -Seconds 10
-  $json = Invoke-Gh run list --repo $slug --limit 1 --json status,conclusion,url
+  $json = Invoke-Gh run list --repo $slug --limit 1 --json 'status,conclusion,url'
   if ($script:GhExit -eq 0 -and $json -and $json.Trim() -ne '[]') {
     $run = ($json | ConvertFrom-Json)[0]
     $state = $run.status
