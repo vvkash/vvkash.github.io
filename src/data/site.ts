@@ -35,7 +35,7 @@ export const profile = {
 // ABOUT
 // ---------------------------------------------------------------------------
 export const about: string[] = [
-  "Hi, I'm **Aakash Shah** — a rising senior at `UNC Charlotte`.",
+  "Hi, I'm **Aakash Shah** — a rising senior at UNC Charlotte.",
   '',
   'I love building software. Mostly mobile apps, ML/AI performance work,',
   'reverse engineering, and blockchain.',
@@ -66,7 +66,7 @@ export const experience: Job[] = [
     period: 'Jun 2026 — Aug 2026',
     location: 'Redmond, WA',
     summary: [
-      'On the Data Galaxy team. Built the `pipelines` that pull failure signals out of 200+ production data flows, then the `prediction engine` on top — `PyTorch` and `TensorFlow` in Python, forecasting anomalies up to `48 hours` in advance.',
+      'On the Data Galaxy team. Built the pipelines that pull failure signals out of 200+ production data flows, then the prediction engine on top — PyTorch and TensorFlow in Python, forecasting anomalies up to 48 hours in advance.',
     ],
   },
   {
@@ -74,9 +74,7 @@ export const experience: Job[] = [
     org: 'watsonx NLP',
     role: 'Software Engineer Intern',
     period: 'Fall 2026',
-    summary: [
-      'Tuning language models for enterprise text, and the `AI infra` around them that gets predictions in front of real users.',
-    ],
+    summary: [],
   },
   {
     company: 'SAS Institute',
@@ -85,17 +83,17 @@ export const experience: Job[] = [
     period: 'May 2025 — May 2026',
     location: 'Cary, NC',
     summary: [
-      'Anomaly detection for industrial IoT — training `pipelines` that halved model time, and `Go` + `Python` APIs streaming live HVAC and solar predictions.',
+      'Anomaly detection for industrial IoT — training pipelines that halved model time, and Go + Python APIs streaming live HVAC and solar predictions.',
     ],
   },
   {
     company: 'AI4Health',
-    org: 'Mobile Security Research',
-    role: 'Android ML Researcher',
+    org: 'Mobile Security',
+    role: 'Android Undergraduate Research',
     period: 'Mar 2026 — Aug 2026',
     location: 'UNC Charlotte',
     summary: [
-      'Android biometrics that recognise you from how you touch your phone. All on-device `PyTorch`, so most of the work was `performance`.',
+      'Android biometrics that recognise you from how you touch your phone. All on-device PyTorch, so most of the work was performance.',
     ],
   },
   {
@@ -105,7 +103,7 @@ export const experience: Job[] = [
     period: 'Aug 2025 — Nov 2025',
     location: 'UNC Charlotte',
     summary: [
-      'Vision Pro navigation for blind users — `CoreML` detection under 80ms, with spatial audio doing the actual guiding.',
+      'Vision Pro navigation for blind users — CoreML detection under 80ms, with spatial audio doing the actual guiding.',
     ],
   },
   {
@@ -115,7 +113,7 @@ export const experience: Job[] = [
     period: 'Jan 2025 — Apr 2025',
     location: 'Remote',
     summary: [
-      'Internal `tooling` for a 50+ developer org, plus webhook-driven Slack alerts so issues stopped sitting in a queue.',
+      'Internal tooling for a 50+ developer org, plus webhook-driven Slack alerts so issues stopped sitting in a queue.',
     ],
   },
 ];
@@ -138,7 +136,7 @@ export const education: School[] = [
     period: 'Expected May 2027',
     location: 'Charlotte, NC',
     summary: [
-      'Rising senior. Coursework in `data structures & algorithms`, computer networks, systems and architecture.',
+      'Rising senior. Coursework in data structures & algorithms, computer networks, systems and architecture.',
     ],
   },
 ];

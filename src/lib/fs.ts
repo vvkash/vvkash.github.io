@@ -38,8 +38,9 @@ function jobFile(job: (typeof experience)[number]): FsFile {
     lines: [
       `**${job.company}**${job.org ? `   \`${job.org}\`` : ''}`,
       `~${meta}~`,
-      '',
-      ...job.summary,
+      // A role with nothing to say stops at its header rather than trailing a
+      // blank line.
+      ...(job.summary.length ? ['', ...job.summary] : []),
     ],
   };
 }

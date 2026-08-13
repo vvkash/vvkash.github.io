@@ -7,6 +7,7 @@ import {
   identityRow,
   menu,
   menuHeader,
+  pageRows,
   WORDMARK_ROWS,
   type CommandCtx,
   type Out,
@@ -154,6 +155,13 @@ export default function Terminal() {
   const exec = useCallback(
     (raw: string) => {
       const cmd = raw.trim();
+      const [name, ...args] = cmd.split(/\s+/);
+      const command = cmd ? findCommand(name) : undefined;
+
+      // Sections replace the screen instead of stacking under whatever was read
+      // last, so jumping from `experience` to `4` reads as a new page rather
+      // than a longer and longer scrollback. Shell commands stay additive.
+      if (command?.page) replaceAll(pageRows());
 
       emit([
         {
@@ -172,9 +180,6 @@ export default function Terminal() {
       historyRef.current = [...historyRef.current.filter((h) => h !== cmd), cmd].slice(-HISTORY_MAX);
       histIdxRef.current = -1;
 
-      const [name, ...args] = cmd.split(/\s+/);
-      const command = findCommand(name);
-
       if (!command) {
         emit([{ t: `zsh: command not found: ${name}`, c: 'red' }]);
         return;
@@ -192,7 +197,7 @@ export default function Terminal() {
       const out = command.run(args, ctx);
       if (out?.length) emit(out);
     },
-    [clear, emit, setTheme],
+    [clear, emit, replaceAll, setTheme],
   );
 
   const runNow = useCallback(

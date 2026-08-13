@@ -49,7 +49,7 @@ Inside any string you can use:
 | Markup                | Renders as                                    |
 | --------------------- | --------------------------------------------- |
 | `**text**`            | bright white — names and headings              |
-| `` `text` ``          | green highlight — the words worth noticing     |
+| `` `text` ``          | green — labels and numbers worth noticing      |
 | `~text~`              | dim grey — dates, locations, stacks            |
 | `[label](https://...)`| clickable link                                 |
 
@@ -58,8 +58,10 @@ Inside any string you can use:
 
 A role prints as its company in white with the team in green beside it, then a
 dim line of role · dates · location, then plain prose — so `summary` is written
-as sentences, not bullets. The renderers live in
-[`src/lib/fs.ts`](src/lib/fs.ts) (`jobFile`, `schoolFile`, `projectFile`).
+as sentences, not bullets, and green is kept for labels rather than sprinkled
+through the prose. Leave `summary` empty and the role stops after its header.
+The renderers live in [`src/lib/fs.ts`](src/lib/fs.ts) (`jobFile`, `schoolFile`,
+`projectFile`).
 
 `public/resume.pdf` is what `open resume.pdf` opens — replace the file to
 update it.
@@ -99,7 +101,7 @@ straight to the end.
   1  about        who i am
   2  experience   where i've worked
   3  education    where i studied
-  4  projects     what i've built
+  4  projects     what i'm building right now
   5  skills       what i work with
   6  contact      how to reach me
 ```
@@ -112,6 +114,15 @@ straight to the end.
 - **Ctrl+A/E/U/K/W** readline editing, **Ctrl+C** cancels, **Ctrl+L** clears
 - `menu`, `help`, `whoami`, `history`, `theme <name>`, `banner`, `clear`
 - Hidden: `date`, `echo`, `uname`, `man`, `sudo`, `exit`
+
+### Pages vs shell commands
+
+Sections, `menu` and `help` are marked `page: true` in the registry. A page
+wipes the screen and redraws a short header — wordmark, tagline, and a line
+pointing at `menu`/`help` — before printing, so going from `experience` to `4`
+reads as a new page instead of a scrollback that only ever grows. Everything
+else (`ls`, `cd`, `cat`, `tree`, …) appends the way a real shell does. The
+header is `pageRows()` in [`src/lib/commands.ts`](src/lib/commands.ts).
 
 ### Changing the menu
 

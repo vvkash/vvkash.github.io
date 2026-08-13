@@ -50,6 +50,12 @@ export type Command = {
   desc: string;
   /** Hidden from `help`, but still runnable. */
   hidden?: boolean;
+  /**
+   * A view rather than a shell operation: it wipes the screen before drawing,
+   * so moving between sections reads like turning a page instead of scrolling
+   * through everything you already looked at. Filesystem commands stay additive.
+   */
+  page?: boolean;
   /** `help` prints a blank line whenever this changes. */
   group?: string;
   run: (args: string[], ctx: CommandCtx) => Out[] | void;
@@ -139,6 +145,7 @@ const registry: Command[] = [
     usage: 'menu',
     desc: 'the short version',
     group: 'me',
+    page: true,
     run: () => menu(),
   },
 
@@ -148,6 +155,7 @@ const registry: Command[] = [
       usage: s.name,
       desc: s.hint,
       group: 'me',
+      page: true,
       run: () => readSection(s.path),
     }),
   ),
@@ -156,6 +164,7 @@ const registry: Command[] = [
     name: 'help',
     usage: 'help',
     desc: 'list available commands',
+    page: true,
     run: () => {
       const out: Out[] = [];
       const shown = registry.filter((c) => !c.hidden);
@@ -521,6 +530,28 @@ export function identityRow(): Out {
     { t: profile.tagline, c: 'fg' },
     { t: `  ·  ${profile.location}`, c: 'dim' },
   ]);
+}
+
+/**
+ * What a page redraws above its content: the wordmark, who you are, and a way
+ * back. Without the last line, clicking a section from the boot menu would wipe
+ * the menu and leave nothing pointing anywhere.
+ */
+export function pageRows(): Out[] {
+  return [
+    bannerRow(),
+    L(),
+    identityRow(),
+    L(),
+    S([
+      { t: '  ' },
+      { t: 'menu', c: 'green', run: 'menu' },
+      { t: ' for the list, ', c: 'dim' },
+      { t: 'help', c: 'green', run: 'help' },
+      { t: ' for everything', c: 'dim' },
+    ]),
+    L(),
+  ];
 }
 
 /** The line the boot spinner turns into once loading finishes. */
