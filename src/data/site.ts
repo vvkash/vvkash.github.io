@@ -66,12 +66,12 @@ export const experience: Job[] = [
     ],
   },
   {
-    // TODO: add the dates and location, e.g. period: 'Summer 2025'.
     role: 'Software Engineer Intern',
     company: 'IBM',
+    period: 'Fall 2026',
     bullets: [
-      'Worked on `watsonx` **NLP** — evaluating and tuning language models for enterprise text workloads.',
-      'Built the services around the model stack so predictions actually reached users.',
+      '`watsonx` **NLP** — evaluating and tuning language models for enterprise text workloads.',
+      'Model serving and the plumbing around it, so predictions actually reach users.',
     ],
   },
   {
