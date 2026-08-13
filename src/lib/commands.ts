@@ -3,11 +3,13 @@ import {
   completePath,
   displayName,
   displayPath,
+  HOME,
   isDir,
   lookup,
   resolvePath,
   sortedChildren,
   type FsDir,
+  type FsFile,
   type FsNode,
 } from './fs';
 import { THEME_NAMES } from './themes';
@@ -46,6 +48,8 @@ export type Command = {
   desc: string;
   /** Hidden from `help`, but still runnable. */
   hidden?: boolean;
+  /** `help` prints a blank line whenever this changes. */
+  group?: string;
   run: (args: string[], ctx: CommandCtx) => Out[] | void;
 };
 
@@ -78,16 +82,88 @@ function columns(nodes: FsNode[], prefix: string, cols: number): Out[] {
   return rows;
 }
 
+/**
+ * The numbered menu shown on boot. Each entry is just a shortcut to a path in
+ * the filesystem, so the menu and the shell never disagree about what exists.
+ */
+type Section = { name: string; path: string; hint: string };
+
+const SECTIONS: Section[] = [
+  { name: 'about', path: '~/about.txt', hint: 'who i am' },
+  { name: 'experience', path: '~/experience', hint: "where i've worked" },
+  { name: 'education', path: '~/education', hint: 'where i studied' },
+  { name: 'projects', path: '~/projects', hint: "what i've built" },
+  { name: 'skills', path: '~/skills.txt', hint: 'what i work with' },
+  { name: 'contact', path: '~/contact.txt', hint: 'how to reach me' },
+];
+
+/** Prints a file, or every file in a directory separated by rules. */
+function readSection(path: string): Out[] {
+  const node = lookup(resolvePath(HOME, path));
+  if (!node) return err(`${path}: No such file or directory`);
+  if (!isDir(node)) return node.lines.map((l) => L(l));
+
+  const files = sortedChildren(node).filter((c): c is FsFile => !isDir(c));
+  return files.flatMap((f, i) => [...(i ? [L()] : []), ...f.lines.map((l) => L(l))]);
+}
+
+/** The boot menu. Every row runs its section when clicked. */
+export function menu(): Out[] {
+  const pad = Math.max(...SECTIONS.map((s) => s.name.length));
+
+  return [
+    ...SECTIONS.map((s, i) =>
+      S([
+        { t: `  ${i + 1}  `, c: 'dim' },
+        { t: s.name.padEnd(pad), c: 'cyan', run: s.name },
+        { t: '   ' },
+        { t: s.hint, c: 'dim' },
+      ]),
+    ),
+    L(),
+    S([
+      { t: '  pick a number, type a name, or ', c: 'dim' },
+      { t: 'ls', c: 'green', run: 'ls' },
+      { t: ' to look around yourself.', c: 'dim' },
+    ]),
+  ];
+}
+
 const registry: Command[] = [
+  {
+    name: 'menu',
+    usage: 'menu',
+    desc: 'the short version',
+    group: 'me',
+    run: () => menu(),
+  },
+
+  ...SECTIONS.map(
+    (s): Command => ({
+      name: s.name,
+      usage: s.name,
+      desc: s.hint,
+      group: 'me',
+      run: () => readSection(s.path),
+    }),
+  ),
+
   {
     name: 'help',
     usage: 'help',
     desc: 'list available commands',
     run: () => {
       const out: Out[] = [];
-      const pad = Math.max(...registry.filter((c) => !c.hidden).map((c) => c.usage.length));
-      for (const c of registry) {
-        if (c.hidden) continue;
+      const shown = registry.filter((c) => !c.hidden);
+      const pad = Math.max(...shown.map((c) => c.usage.length));
+      let group = shown[0]?.group ?? 'shell';
+
+      for (const c of shown) {
+        const g = c.group ?? 'shell';
+        if (g !== group) {
+          out.push(L());
+          group = g;
+        }
         out.push(
           S([
             { t: '  ' },
@@ -361,6 +437,11 @@ const registry: Command[] = [
 export const COMMANDS = registry;
 
 export function findCommand(name: string): Command | undefined {
+  // A bare number picks the matching row from the boot menu.
+  if (/^\d+$/.test(name)) {
+    const section = SECTIONS[Number(name) - 1];
+    return section && registry.find((c) => c.name === section.name);
+  }
   return registry.find((c) => c.name === name.toLowerCase());
 }
 
@@ -413,22 +494,25 @@ export function complete(input: string, cwd: string): { value: string; matches: 
   return { value, matches: candidates.length > 1 ? candidates : [] };
 }
 
-/** The greeting printed once on boot. Deliberately short. */
-export function welcome(): Out[] {
-  return [
-    ...WORDMARK.map(art),
-    L(),
-    S([
-      { t: profile.tagline, c: 'fg' },
-      { t: `  ·  ${profile.location}`, c: 'dim' },
-    ]),
-    L(),
-    S([
-      { t: 'type ', c: 'dim' },
-      { t: 'help', c: 'green', run: 'help' },
-      { t: ' for commands, or ', c: 'dim' },
-      { t: 'ls', c: 'green', run: 'ls' },
-      { t: ' to look around.', c: 'dim' },
-    ]),
-  ];
+/** The wordmark, as output rows. */
+export function bannerRows(): Out[] {
+  return WORDMARK.map(art);
+}
+
+/** Tagline and location, on one line. */
+export function identityRow(): Out {
+  return S([
+    { t: profile.tagline, c: 'fg' },
+    { t: `  ·  ${profile.location}`, c: 'dim' },
+  ]);
+}
+
+/** The line the boot spinner turns into once loading finishes. */
+export function menuHeader(): Out {
+  return S([
+    { t: '  what do you want to see? ', c: 'fg' },
+    { t: `(${SECTIONS.length} sections, or `, c: 'dim' },
+    { t: 'help', c: 'green', run: 'help' },
+    { t: ' for everything)', c: 'dim' },
+  ]);
 }

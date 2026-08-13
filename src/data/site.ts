@@ -72,6 +72,30 @@ export const experience: Job[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// EDUCATION — TODO: replace with your real school
+// ---------------------------------------------------------------------------
+export type School = {
+  degree: string;
+  school: string;
+  period: string;
+  location?: string;
+  bullets: string[];
+};
+
+export const education: School[] = [
+  {
+    degree: 'TODO: B.S. in Computer Science',
+    school: 'TODO: University',
+    period: '20XX — 20XX',
+    location: 'TODO: City, ST',
+    bullets: [
+      'TODO: coursework worth bragging about.',
+      'TODO: clubs, research, TA work, awards.',
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
 // PROJECTS — TODO: replace with your real projects
 // ---------------------------------------------------------------------------
 export type Project = {

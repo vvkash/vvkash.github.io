@@ -37,6 +37,7 @@ Look for the `TODO:` markers.
 | `profile`    | The prompt, the banner line, `whoami`, `~/resume.pdf`    |
 | `about`      | `~/about.txt`                                            |
 | `experience` | `~/experience/<company>.md` — one file per role          |
+| `education`  | `~/education/<school>.md` — one file per school          |
 | `projects`   | `~/projects/<slug>.md` — one file per project            |
 | `skills`     | `~/skills.txt`                                           |
 | `contact`    | `~/contact.txt`                                          |
@@ -81,13 +82,34 @@ full ANSI set — output colours are driven entirely by the active scheme.
 
 ## What visitors can do
 
+The terminal boots over about two and a half seconds — the wordmark draws a row
+at a time, a spinner runs, and then the menu appears. Any key or click skips
+straight to the end.
+
+```
+  1  about        who i am
+  2  experience   where i've worked
+  3  education    where i studied
+  4  projects     what i've built
+  5  skills       what i work with
+  6  contact      how to reach me
+```
+
+- Pick a number, type the name, or click the row — all three run the same thing
 - `ls`, `cd`, `pwd`, `cat`, `tree`, `open` — the filesystem is real enough to
   explore, and `ls` colours directories blue and links red like a real shell
 - Click any filename in the output to `cd`/`cat`/`open` it
 - **Tab** completes both command names and paths; **↑ / ↓** walk history
 - **Ctrl+A/E/U/K/W** readline editing, **Ctrl+C** cancels, **Ctrl+L** clears
-- `help`, `whoami`, `history`, `theme <name>`, `banner`, `clear`
+- `menu`, `help`, `whoami`, `history`, `theme <name>`, `banner`, `clear`
 - Hidden: `date`, `echo`, `uname`, `man`, `sudo`, `exit`
+
+### Changing the menu
+
+The menu is the `SECTIONS` array at the top of
+[`src/lib/commands.ts`](src/lib/commands.ts). Each entry is a name, a path into
+the filesystem and a one-line hint; adding one gives you a numbered row, a
+command of that name, and tab completion for free.
 
 ---
 

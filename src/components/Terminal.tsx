@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { complete, findCommand, welcome, type CommandCtx, type Out, type Seg } from '../lib/commands';
+import {
+  bannerRows,
+  complete,
+  findCommand,
+  identityRow,
+  menu,
+  menuHeader,
+  type CommandCtx,
+  type Out,
+  type Seg,
+} from '../lib/commands';
 import { displayPath, HOME } from '../lib/fs';
 import { applyTheme, findTheme, THEMES } from '../lib/themes';
 import { profile } from '../data/site';
@@ -11,10 +21,29 @@ type Row = Out & { id: number };
 const THEME_KEY = 'axyz.theme';
 const HISTORY_MAX = 100;
 
+/** Classic ASCII spinner: every mono font on earth has these four glyphs. */
+const SPINNER = ['|', '/', '-', '\\'];
+
 /** `Wed Aug 13 12:32:54` — the format macOS prints on login. */
 function loginStamp(d: Date): string {
   const day = d.toDateString().slice(0, 10);
   return `${day} ${d.toTimeString().slice(0, 8)}`;
+}
+
+/** Everything the boot ends up having printed, in order. */
+function bootRows(stamp: string): Out[] {
+  return [
+    { t: `Last login: ${stamp} on ttys000`, c: 'dim' },
+    {},
+    ...bannerRows(),
+    {},
+    identityRow(),
+    {},
+    menuHeader(),
+    {},
+    ...menu(),
+    {},
+  ];
 }
 
 export default function Terminal() {
@@ -27,6 +56,12 @@ export default function Terminal() {
 
   const idRef = useRef(0);
   const bootedRef = useRef(false);
+  const bootRef = useRef<{ timers: number[]; spinner: number; stamp: string; done: boolean }>({
+    timers: [],
+    spinner: 0,
+    stamp: '',
+    done: false,
+  });
   const historyRef = useRef<string[]>([]);
   const histIdxRef = useRef(-1);
   const draftRef = useRef('');
@@ -48,6 +83,28 @@ export default function Terminal() {
         return { ...o, id: idRef.current };
       }),
     ]);
+  }, []);
+
+  /** Emits one row and hands back its id so it can be rewritten in place. */
+  const emitLive = useCallback((o: Out) => {
+    idRef.current += 1;
+    const id = idRef.current;
+    setRows((prev) => [...prev, { ...o, id }]);
+    return id;
+  }, []);
+
+  /** Rewrites an already-printed row, the way \r lets a spinner redraw. */
+  const rewrite = useCallback((id: number, o: Out) => {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...o, id } : r)));
+  }, []);
+
+  const replaceAll = useCallback((items: Out[]) => {
+    setRows(
+      items.map((o) => {
+        idRef.current += 1;
+        return { ...o, id: idRef.current };
+      }),
+    );
   }, []);
 
   const clear = useCallback(() => setRows([]), []);
@@ -145,6 +202,24 @@ export default function Terminal() {
     [exec],
   );
 
+  /**
+   * Jumps straight to the finished boot screen. Called when the sequence ends
+   * normally, and when an impatient visitor hits a key part way through.
+   */
+  const finishBoot = useCallback(() => {
+    const b = bootRef.current;
+    if (b.done) return;
+    b.done = true;
+    b.timers.forEach(clearTimeout);
+    b.timers = [];
+    if (b.spinner) clearInterval(b.spinner);
+    b.spinner = 0;
+
+    replaceAll(bootRows(b.stamp));
+    setBusy(false);
+    inputRef.current?.focus({ preventScroll: true });
+  }, [replaceAll]);
+
   // ---- boot -----------------------------------------------------------------
   useEffect(() => {
     const saved = (() => {
@@ -159,15 +234,42 @@ export default function Terminal() {
     if (bootedRef.current) return;
     bootedRef.current = true;
 
-    emit([
-      { t: `Last login: ${loginStamp(new Date())} on ttys000`, c: 'dim' },
-      {},
-      ...welcome(),
-      {},
-    ]);
-    setBusy(false);
-    inputRef.current?.focus({ preventScroll: true });
-  }, [emit]);
+    const b = bootRef.current;
+    b.stamp = loginStamp(new Date());
+    const at = (ms: number, fn: () => void) => b.timers.push(window.setTimeout(fn, ms));
+
+    emit([{ t: `Last login: ${b.stamp} on ttys000`, c: 'dim' }, {}]);
+
+    // The wordmark draws itself a row at a time, like a slow tty.
+    bannerRows().forEach((row, i) => at(160 + i * 70, () => emit([row])));
+
+    at(520, () => emit([{}, identityRow()]));
+
+    at(700, () => {
+      let frame = 0;
+      const spinnerRow = (f: number): Out => ({
+        segs: [
+          { t: '  ' },
+          { t: SPINNER[f % SPINNER.length], c: 'cyan' },
+          { t: '  loading sections', c: 'dim' },
+        ],
+      });
+
+      emit([{}]);
+      const id = emitLive(spinnerRow(frame));
+      b.spinner = window.setInterval(() => {
+        frame += 1;
+        rewrite(id, spinnerRow(frame));
+      }, 90);
+    });
+
+    at(2400, finishBoot);
+
+    return () => {
+      b.timers.forEach(clearTimeout);
+      if (b.spinner) clearInterval(b.spinner);
+    };
+  }, [emit, emitLive, finishBoot, rewrite]);
 
   // ---- follow the newest output, exactly like a terminal ---------------------
   useEffect(() => {
@@ -194,6 +296,16 @@ export default function Terminal() {
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const el = e.currentTarget;
     const pos = el.selectionStart ?? input.length;
+
+    // Any key during the boot animation skips to the end, as it should. The
+    // keystroke itself still lands, so nobody loses the character they typed.
+    if (!bootRef.current.done) {
+      finishBoot();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        return;
+      }
+    }
 
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -331,6 +443,7 @@ export default function Terminal() {
       className="desk"
       onMouseUp={() => {
         if (window.getSelection()?.toString()) return;
+        if (!bootRef.current.done) finishBoot();
         inputRef.current?.focus({ preventScroll: true });
       }}
     >

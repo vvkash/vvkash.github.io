@@ -5,7 +5,7 @@
  * single file worth editing. Commands like ls / cd / cat operate on this tree,
  * which is what makes the prompt behave like a shell rather than a menu.
  */
-import { about, contact, experience, profile, projects, skills } from '../data/site';
+import { about, contact, education, experience, profile, projects, skills } from '../data/site';
 
 export type FsFile = {
   kind: 'file';
@@ -44,6 +44,20 @@ function jobFile(job: (typeof experience)[number]): FsFile {
   };
 }
 
+function schoolFile(s: (typeof education)[number]): FsFile {
+  return {
+    kind: 'file',
+    name: `${slug(s.school)}.md`,
+    lines: [
+      `**${s.degree}**`,
+      `${s.school}${s.location ? ` · ${s.location}` : ''}`,
+      s.period,
+      '',
+      ...s.bullets.map((b) => `- ${b}`),
+    ],
+  };
+}
+
 function projectFile(p: (typeof projects)[number]): FsFile {
   return {
     kind: 'file',
@@ -78,6 +92,11 @@ export const root: FsDir = {
               kind: 'dir',
               name: 'experience',
               children: experience.map(jobFile),
+            },
+            {
+              kind: 'dir',
+              name: 'education',
+              children: education.map(schoolFile),
             },
             {
               kind: 'dir',
