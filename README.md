@@ -111,6 +111,27 @@ The menu is the `SECTIONS` array at the top of
 the filesystem and a one-line hint; adding one gives you a numbered row, a
 command of that name, and tab completion for free.
 
+### Changing the wordmark
+
+[`src/lib/ascii.ts`](src/lib/ascii.ts) is generated — don't hand-edit it. Change
+`NAME` in [`scripts/wordmark.py`](scripts/wordmark.py) and re-run it:
+
+```powershell
+python scripts\wordmark.py
+```
+
+The letters are a 5×7 bitmap font packed two pixel rows per line with the
+half-block glyphs `▀ ▄ █`, which is what fits a legible face into four terminal
+rows.
+
+Two things keep it from falling apart, both of which are easy to undo by
+accident:
+
+- **`.row.art` must keep `line-height: 1`.** A full block's ink spans 1.17em, so
+  a taller line opens a seam straight through every stroke.
+- **The art must not wrap.** `--art-cols` is fed from `WORDMARK_COLS`, so the
+  art shrinks to fit narrow screens instead of shearing apart.
+
 ---
 
 ## Deploying to aakashxyz.com

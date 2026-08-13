@@ -12,6 +12,7 @@ import {
 } from '../lib/commands';
 import { displayPath, HOME } from '../lib/fs';
 import { applyTheme, findTheme, THEMES } from '../lib/themes';
+import { WORDMARK_COLS } from '../lib/ascii';
 import { profile } from '../data/site';
 import { Inline } from './Inline';
 import '../styles/terminal.css';
@@ -448,6 +449,8 @@ export default function Terminal() {
       }}
     >
       <main className="win">
+        {/* The wordmark is pixel art, so give the page a real name to read. */}
+        <h1 className="sr-only">{profile.name}</h1>
         <header className="bar">
           <div className="lights" aria-hidden="true">
             <span className="light close" />
@@ -459,14 +462,22 @@ export default function Terminal() {
           </div>
         </header>
 
-        <div className="screen" ref={screenRef}>
+        <div
+          className="screen"
+          ref={screenRef}
+          style={{ '--art-cols': WORDMARK_COLS } as React.CSSProperties}
+        >
           {/* Ten characters wide, used to measure one cell. */}
           <span aria-hidden="true" className="cell-probe" ref={cellRef}>
             0000000000
           </span>
 
           {rows.map((row) => (
-            <div className={`row ${row.c ?? ''}`} key={row.id}>
+            <div
+              aria-hidden={row.c === 'art' || undefined}
+              className={`row ${row.c ?? ''}`}
+              key={row.id}
+            >
               {row.segs ? (
                 row.segs.map((seg, i) =>
                   seg.run ? (
