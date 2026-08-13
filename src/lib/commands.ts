@@ -94,7 +94,7 @@ const SECTIONS: Section[] = [
   { name: 'about', path: '~/about.txt', hint: 'who i am' },
   { name: 'experience', path: '~/experience', hint: "where i've worked" },
   { name: 'education', path: '~/education', hint: 'where i studied' },
-  { name: 'projects', path: '~/projects', hint: "what i've built" },
+  { name: 'projects', path: '~/projects', hint: "what i'm building right now" },
   { name: 'skills', path: '~/skills.txt', hint: 'what i work with' },
   { name: 'contact', path: '~/contact.txt', hint: 'how to reach me' },
 ];

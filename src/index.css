@@ -69,7 +69,7 @@ a:focus-visible {
 }
 
 .code {
-  color: var(--yellow);
+  color: var(--green);
 }
 
 @media (prefers-reduced-motion: reduce) {

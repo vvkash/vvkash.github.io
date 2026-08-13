@@ -30,7 +30,6 @@ npm run preview  # serve the production build
 ## Fill in your content
 
 **Everything you need to edit lives in one file: [`src/data/site.ts`](src/data/site.ts).**
-Look for the `TODO:` markers.
 
 | Export       | Becomes                                                 |
 | ------------ | ------------------------------------------------------- |
@@ -47,13 +46,23 @@ second place to register it.
 
 Inside any string you can use:
 
-| Markup                | Renders as        |
-| --------------------- | ----------------- |
-| `**text**`            | bright highlight  |
-| `` `text` ``          | accent colour     |
-| `[label](https://...)`| clickable link    |
+| Markup                | Renders as                                    |
+| --------------------- | --------------------------------------------- |
+| `**text**`            | bright white — names and headings              |
+| `` `text` ``          | green highlight — the words worth noticing     |
+| `~text~`              | dim grey — dates, locations, stacks            |
+| `[label](https://...)`| clickable link                                 |
 
-Drop a `resume.pdf` into `public/` and `open resume.pdf` will open it.
+`~dim~` needs a matching pair on the same line, so a lone `~` in a path like
+`~/projects` is left alone.
+
+A role prints as its company in white with the team in green beside it, then a
+dim line of role · dates · location, then plain prose — so `summary` is written
+as sentences, not bullets. The renderers live in
+[`src/lib/fs.ts`](src/lib/fs.ts) (`jobFile`, `schoolFile`, `projectFile`).
+
+`public/resume.pdf` is what `open resume.pdf` opens — replace the file to
+update it.
 
 ### Adding a command
 
@@ -147,6 +156,10 @@ rows would offset each one sideways and staircase the stems.
 green prompt and menu. The `:root` block in
 [`src/index.css`](src/index.css) mirrors it so the very first paint is already
 right; change one and change the other.
+
+`` `code` `` spans are green (`--green`) and `~dim~` spans grey (`--dim`), both
+set in [`src/index.css`](src/index.css) — that is what makes every highlight
+across the site follow the active theme.
 
 ---
 

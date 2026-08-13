@@ -31,30 +31,25 @@ const slug = (s: string) =>
     .replace(/^-|-$/g, '');
 
 function jobFile(job: (typeof experience)[number]): FsFile {
+  const meta = [job.role, job.period, job.location].filter(Boolean).join('  ·  ');
   return {
     kind: 'file',
     name: `${slug(job.company)}.md`,
     lines: [
-      `**${job.role}**`,
-      `${job.company}${job.location ? ` · ${job.location}` : ''}`,
-      ...(job.period ? [job.period] : []),
+      `**${job.company}**${job.org ? `   \`${job.org}\`` : ''}`,
+      `~${meta}~`,
       '',
-      ...job.bullets.map((b) => `- ${b}`),
+      ...job.summary,
     ],
   };
 }
 
 function schoolFile(s: (typeof education)[number]): FsFile {
+  const meta = [s.degree, s.period, s.location].filter(Boolean).join('  ·  ');
   return {
     kind: 'file',
     name: `${slug(s.school)}.md`,
-    lines: [
-      `**${s.degree}**`,
-      `${s.school}${s.location ? ` · ${s.location}` : ''}`,
-      s.period,
-      '',
-      ...s.bullets.map((b) => `- ${b}`),
-    ],
+    lines: [`**${s.school}**`, `~${meta}~`, '', ...s.summary],
   };
 }
 
@@ -67,8 +62,8 @@ function projectFile(p: (typeof projects)[number]): FsFile {
       '',
       p.blurb,
       '',
-      `stack: ${p.stack.map((s) => `\`${s}\``).join(' ')}`,
-      ...(p.url ? ['', `[${p.url}](${p.url})`] : []),
+      `~${p.stack.join('  ·  ')}~`,
+      ...(p.url ? [`[${p.urlLabel ?? p.url}](${p.url})`] : []),
     ],
   };
 }
@@ -108,7 +103,7 @@ export const root: FsDir = {
               name: 'skills.txt',
               lines: (() => {
                 const pad = Math.max(...skills.map((s) => s.group.length));
-                return skills.map((s) => `${s.group.padEnd(pad)}   ${s.items.join('  ')}`);
+                return skills.map((s) => `\`${s.group.padEnd(pad)}\`   ${s.items.join('  ·  ')}`);
               })(),
             },
             { kind: 'file', name: 'contact.txt', lines: contact },

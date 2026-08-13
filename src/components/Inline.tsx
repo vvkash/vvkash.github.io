@@ -2,9 +2,12 @@ import type { JSX } from 'react';
 
 /**
  * Renders the tiny inline markup used across src/data/site.ts:
- *   **bold**   `code`   [label](url)
+ *   **bold**   `code`   ~dim~   [label](url)
+ *
+ * `~dim~` needs a matching pair on the same line, so a lone `~` in a path like
+ * ~/projects is left alone.
  */
-const TOKEN = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+const TOKEN = /(\*\*[^*]+\*\*|`[^`]+`|~[^~]+~|\[[^\]]+\]\([^)]+\))/g;
 
 export function Inline({ text }: { text: string }): JSX.Element {
   const parts = text.split(TOKEN).filter((p) => p !== undefined && p !== '');
@@ -22,6 +25,13 @@ export function Inline({ text }: { text: string }): JSX.Element {
         if (p.length > 2 && p.startsWith('`') && p.endsWith('`')) {
           return (
             <span className="code" key={i}>
+              {p.slice(1, -1)}
+            </span>
+          );
+        }
+        if (p.length > 2 && p.startsWith('~') && p.endsWith('~')) {
+          return (
+            <span className="dim" key={i}>
               {p.slice(1, -1)}
             </span>
           );

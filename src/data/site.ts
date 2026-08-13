@@ -7,8 +7,9 @@
  *  adding a project adds ~/projects/<slug>.md that visitors can `ls` and `cat`.
  *
  *  Tiny markup you can use inside any string below:
- *    **bold**              -> bright highlight
- *    `code`                -> accent color
+ *    **bold**              -> bright white
+ *    `code`                -> green highlight, for the words worth noticing
+ *    ~dim~                 -> muted grey, for dates and other metadata
  *    [label](https://url)  -> clickable link
  *    ''                    -> blank line
  *
@@ -46,72 +47,75 @@ export const about: string[] = [
 // EXPERIENCE
 // ---------------------------------------------------------------------------
 export type Job = {
-  role: string;
   company: string;
-  /** Omit it and the date line is left out entirely. */
+  /** The team or org inside the company, printed next to it in green. */
+  org?: string;
+  role: string;
+  /** Omit it and the date is left out entirely. */
   period?: string;
   location?: string;
-  bullets: string[];
+  /** Plain prose, no bullets. One or two sentences is the point. */
+  summary: string[];
 };
 
 export const experience: Job[] = [
   {
-    role: 'Software Engineer Intern',
     company: 'Microsoft',
+    org: 'Azure + AI',
+    role: 'Software Engineer Intern',
     period: 'Jun 2026 — Aug 2026',
     location: 'Redmond, WA',
-    bullets: [
-      'Built `Azure` Functions collectors that pull failure telemetry out of 200+ production data pipelines into one place.',
-      'Trained **AI** models on Azure that call incidents 24h early at 94% precision, and clustered repeat failures with embeddings.',
+    summary: [
+      'On the Data Galaxy team, building the `pipelines` that pull failure signals out of 200+ production data flows — and the `prediction engine` that calls incidents about a day before they land.',
     ],
   },
   {
-    role: 'Software Engineer Intern',
     company: 'IBM',
+    org: 'watsonx NLP',
+    role: 'Software Engineer Intern',
     period: 'Fall 2026',
-    bullets: [
-      '`watsonx` **NLP** — evaluating and tuning language models for enterprise text workloads.',
-      'Model serving and the plumbing around it, so predictions actually reach users.',
+    summary: [
+      'Tuning language models for enterprise text, and the `AI infra` around them that gets predictions in front of real users.',
     ],
   },
   {
-    role: 'Software Engineer Intern',
     company: 'SAS Institute',
+    org: 'AI/ML Anomaly Detection',
+    role: 'Software Engineer Intern',
     period: 'May 2025 — May 2026',
     location: 'Cary, NC',
-    bullets: [
-      'Built ML pipelines for anomaly detection on industrial IoT, halving model training time.',
-      'Shipped `Go` and `Python` APIs streaming live HVAC and solar predictions, cutting false alerts by 40%.',
+    summary: [
+      'Anomaly detection for industrial IoT — training `pipelines` that halved model time, and `Go` + `Python` APIs streaming live HVAC and solar predictions.',
     ],
   },
   {
-    role: 'Undergraduate Researcher',
     company: 'AI4Health',
+    org: 'Mobile Security Research',
+    role: 'Undergraduate Researcher',
     period: 'Mar 2026 — Aug 2026',
     location: 'UNC Charlotte',
-    bullets: [
-      'Built an Android biometric engine in `Kotlin` that fuses touch dynamics and heart rate into passive authentication.',
-      'Ran on-device `PyTorch` models at sub-100ms inference for DARPA-affiliated mobile security research.',
+    summary: [
+      'Android biometrics that recognise you from how you touch your phone. All on-device `PyTorch`, so most of the work was `performance`.',
     ],
   },
   {
-    role: 'Undergraduate Researcher',
     company: 'VisioniOS Lab',
+    org: 'Spatial Computing',
+    role: 'Undergraduate Researcher',
     period: 'Aug 2025 — Nov 2025',
     location: 'UNC Charlotte',
-    bullets: [
-      'Engineered a `CoreML` detection engine on Vision Pro in Swift — sub-80ms latency, 92% accuracy.',
-      'Built spatial audio cues with `RealityKit` and `ARKit`, cutting navigation errors for blind users by 38%.',
+    summary: [
+      'Vision Pro navigation for blind users — `CoreML` detection under 80ms, with spatial audio doing the actual guiding.',
     ],
   },
   {
-    role: 'Software Engineer Intern',
     company: 'NEIC',
+    org: 'Developer Tooling',
+    role: 'Software Engineer Intern',
     period: 'Jan 2025 — Apr 2025',
     location: 'Remote',
-    bullets: [
-      'Built internal tooling with `TypeScript`, `MongoDB` and `Docker` for a 50+ developer org.',
-      'Automated issue tracking with webhook-driven Slack alerts, cutting response time by 45%.',
+    summary: [
+      'Internal `tooling` for a 50+ developer org, plus webhook-driven Slack alerts so issues stopped sitting in a queue.',
     ],
   },
 ];
@@ -120,22 +124,21 @@ export const experience: Job[] = [
 // EDUCATION
 // ---------------------------------------------------------------------------
 export type School = {
-  degree: string;
   school: string;
+  degree: string;
   period: string;
   location?: string;
-  bullets: string[];
+  summary: string[];
 };
 
 export const education: School[] = [
   {
-    degree: 'B.S. in Computer Science',
     school: 'UNC Charlotte',
+    degree: 'B.S. Computer Science',
     period: 'Expected May 2027',
     location: 'Charlotte, NC',
-    bullets: [
-      'University of North Carolina at Charlotte — rising senior.',
-      'Coursework: data structures & algorithms, computer networks, computer systems, computer architecture.',
+    summary: [
+      'Rising senior. Coursework in `data structures & algorithms`, computer networks, systems and architecture.',
     ],
   },
 ];
@@ -148,46 +151,61 @@ export type Project = {
   blurb: string;
   stack: string[];
   url?: string;
+  /** What the link reads as. Falls back to the bare URL. */
+  urlLabel?: string;
 };
 
 export const projects: Project[] = [
   {
     name: 'Gravity Terminal',
     blurb:
-      'Two-leg arbitrage engine across Kalshi and Polymarket, with slippage limits, automated hedge retry, and $50k+ routed on-chain.',
+      'Two-leg arbitrage engine across Kalshi and Polymarket — slippage limits, automated hedge retry, and `$50k+` routed on-chain.',
     stack: ['Go', 'TypeScript', 'React', 'PostgreSQL', 'Solana'],
+    url: 'https://gravityterminal.app/',
+    urlLabel: 'gravityterminal.app',
   },
   {
     name: 'Gold Mine UNCC',
     blurb:
-      'iOS and Android app used by 3,500 students for transit, maps and campus services, with offline caching.',
+      'iOS and Android app for campus transit, maps and services — `3,500 users`, with offline caching.',
     stack: ['Swift', 'Kotlin', 'Jetpack Compose', 'MapKit', 'Core Data'],
-  },
-  {
-    name: 'aakashxyz.com',
-    blurb: 'This site. A terminal you can actually talk to.',
-    stack: ['React', 'TypeScript', 'Vite'],
-    url: 'https://aakashxyz.com',
+    url: 'https://apps.apple.com/in/app/gold-mine-uncc/id6744618754',
+    urlLabel: 'App Store',
   },
 ];
 
 // ---------------------------------------------------------------------------
 // CONTACT — shown by `cat contact.txt`
 // ---------------------------------------------------------------------------
+const contactRows: { label: string; text: string; url: string }[] = [
+  { label: 'email', text: profile.email, url: `mailto:${profile.email}` },
+  ...profile.socials.map((s) => ({
+    label: s.label.toLowerCase(),
+    text: s.url.replace(/^https?:\/\//, ''),
+    url: s.url,
+  })),
+];
+
+const contactPad = Math.max(...contactRows.map((r) => r.label.length));
+
 export const contact: string[] = [
-  `email      [${profile.email}](mailto:${profile.email})`,
-  ...profile.socials.map((s) => `${s.label.toLowerCase().padEnd(10)} [${s.url}](${s.url})`),
+  ...contactRows.map((r) => `\`${r.label.padEnd(contactPad)}\`   [${r.text}](${r.url})`),
   '',
-  `based in ${profile.location}. always up for a good problem.`,
+  'currently in the seattle area, heading to the bay for the fall.',
+  'always open for a chat and opportunities :)',
 ];
 
 // ---------------------------------------------------------------------------
 // SKILLS
 // ---------------------------------------------------------------------------
 export const skills: { group: string; items: string[] }[] = [
-  { group: 'languages', items: ['Python', 'Go', 'Swift', 'C++', 'TypeScript', 'Kotlin', 'Java'] },
+  {
+    group: 'languages',
+    items: ['Python', 'Go', 'Swift', 'TypeScript', 'Kotlin', 'C++', 'Java'],
+  },
   { group: 'ml + ai', items: ['PyTorch', 'LightGBM', 'CoreML', 'embeddings', 'NLP'] },
   { group: 'backend', items: ['FastAPI', 'Flask', 'Express', 'GraphQL', 'PostgreSQL', 'MongoDB'] },
   { group: 'mobile', items: ['SwiftUI', 'Jetpack Compose', 'ARKit', 'visionOS'] },
-  { group: 'cloud', items: ['Azure', 'AWS', 'Docker', 'Grafana', 'GitHub Actions'] },
+  { group: 'cloud', items: ['Azure', 'AWS', 'Docker'] },
+  { group: 'tooling', items: ['GitHub Actions', 'Grafana'] },
 ];
