@@ -2,7 +2,7 @@ export type Theme = {
   name: string;
   /** primary neon */
   neon: string;
-  /** secondary neon, used for the banner gradient + highlights */
+  /** secondary neon, used for highlights */
   neon2: string;
   /** tertiary accent */
   neon3: string;
@@ -12,6 +12,8 @@ export type Theme = {
   dim: string;
   /** page background */
   bg: string;
+  /** ASCII art colour */
+  art: string;
 };
 
 export const THEMES: Theme[] = [
@@ -23,6 +25,7 @@ export const THEMES: Theme[] = [
     text: '#d6f7ff',
     dim: '#5d7f8c',
     bg: '#05070d',
+    art: '#35efd6',
   },
   {
     name: 'matrix',
@@ -32,6 +35,7 @@ export const THEMES: Theme[] = [
     text: '#c8ffc0',
     dim: '#3f7a3a',
     bg: '#000a03',
+    art: '#39ff14',
   },
   {
     name: 'synthwave',
@@ -41,6 +45,7 @@ export const THEMES: Theme[] = [
     text: '#ffd9f4',
     dim: '#8a5a80',
     bg: '#12061f',
+    art: '#ff5ce1',
   },
   {
     name: 'amber',
@@ -50,6 +55,7 @@ export const THEMES: Theme[] = [
     text: '#ffdda8',
     dim: '#8a6224',
     bg: '#0d0700',
+    art: '#ffb000',
   },
   {
     name: 'ice',
@@ -59,6 +65,7 @@ export const THEMES: Theme[] = [
     text: '#e6f6ff',
     dim: '#5b7891',
     bg: '#040910',
+    art: '#7ad7ff',
   },
 ];
 
@@ -72,6 +79,7 @@ export function applyTheme(theme: Theme) {
   r.style.setProperty('--text', theme.text);
   r.style.setProperty('--dim', theme.dim);
   r.style.setProperty('--bg', theme.bg);
+  r.style.setProperty('--art', theme.art);
   document.body.style.background = theme.bg;
 }
 

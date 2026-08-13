@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BANNER_COLS, BANNER_ROWS, BANNER_RUNS, BOOT_LOG } from '../lib/ascii';
+import { BOOT_LOG, banner, widthOf } from '../lib/ascii';
 import { complete, COMPLETIONS, findCommand, L, type CommandCtx, type Out } from '../lib/commands';
 import { applyTheme, findTheme, THEMES } from '../lib/themes';
 import { menu, profile } from '../data/site';
@@ -12,6 +12,10 @@ type Line = { id: number; t: string; c?: string };
 const PROMPT = `${profile.handle}@${profile.host}`;
 const THEME_KEY = 'axyz.theme';
 
+const ART_ROWS = banner(profile.name.toLowerCase());
+const ART = ART_ROWS.join('\n');
+const ART_COLS = widthOf(ART_ROWS);
+
 export default function Terminal() {
   const [lines, setLines] = useState<Line[]>([]);
   const [input, setInput] = useState('');
@@ -22,6 +26,7 @@ export default function Terminal() {
   const runRef = useRef(0);
   const skipRef = useRef(false);
   const startedRef = useRef(false);
+  const interactedRef = useRef(false);
   const historyRef = useRef<string[]>([]);
   const histIdxRef = useRef(-1);
 
@@ -73,6 +78,7 @@ export default function Terminal() {
 
   const clearScreen = useCallback(() => {
     runRef.current += 1;
+    interactedRef.current = false;
     setLines([]);
   }, []);
 
@@ -118,15 +124,18 @@ export default function Terminal() {
   }, [print, pushBanner, clearScreen]);
 
   // ---- keep the newest output in view -------------------------------------
+  // Until the first command runs, hold the view at the top: the boot banner is
+  // taller than a short screen, and scrolling to the bottom hides the name.
   useEffect(() => {
     const el = screenRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el) el.scrollTop = interactedRef.current ? el.scrollHeight : 0;
   }, [lines, booted, menuIdx, input]);
 
   // ---- command execution --------------------------------------------------
   const exec = useCallback(
     async (raw: string) => {
       const cmd = raw.trim();
+      interactedRef.current = true;
       setLines((prev) => [...prev, mk(`${PROMPT}:~$ ${cmd}`, 'echo')]);
       if (!cmd) return;
 
@@ -251,34 +260,15 @@ export default function Terminal() {
         <div className="screen" ref={screenRef}>
           {lines.map((line) =>
             line.c === 'banner' ? (
-              <div className="banner-wrap" key={line.id}>
-                <div className="banner-glow">
-                  <div
-                    aria-label={profile.name}
-                    className="banner"
-                    role="img"
-                    style={
-                      {
-                        '--cols': BANNER_COLS,
-                        '--rows': BANNER_ROWS,
-                      } as React.CSSProperties
-                    }
-                  >
-                    {BANNER_RUNS.map((r) => (
-                      <i
-                        key={`${r.y}-${r.x}`}
-                        style={
-                          {
-                            '--x': r.x,
-                            '--y': r.y,
-                            '--w': r.w,
-                          } as React.CSSProperties
-                        }
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <pre
+                aria-label={profile.name}
+                className="ascii"
+                key={line.id}
+                role="img"
+                style={{ '--cols': ART_COLS } as React.CSSProperties}
+              >
+                {ART}
+              </pre>
             ) : (
               <div className={`line ${line.c ?? ''}`} key={line.id}>
                 <Inline text={line.t} />

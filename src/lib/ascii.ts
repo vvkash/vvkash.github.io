@@ -1,65 +1,57 @@
 /**
- * "AAKASH SHAH" in the ANSI Shadow figlet font.
+ * Terminal artwork.
  *
- * The art is NOT rendered as text. Web fonts routinely ship U+2588 FULL BLOCK
- * with a different advance width than their normal glyphs (Google's JetBrains
- * Mono subset omits it entirely, so it falls back to another face), which makes
- * the character grid drift and visibly warps the letters. Instead the rows are
- * parsed once into rectangles that get drawn with CSS, so the art is
- * pixel-perfect regardless of which font actually loads.
+ * Everything here is plain printable ASCII on purpose. An earlier version drew
+ * the name with U+2588 FULL BLOCK, but web font subsets frequently omit block
+ * glyphs and fall back to a face with a different advance width. That makes the
+ * character grid drift and visibly warps the art. Staying inside ASCII keeps
+ * every glyph on the same advance, so this can be rendered as ordinary text in
+ * a <pre> the way a real terminal would.
  *
- * To change the name: paste new ANSI Shadow art into ROWS. Everything below
- * adapts automatically.
+ * The mascot was produced by rasterising artwork and mapping pixel brightness
+ * onto the density ramp " .:~!XW#$" - the same trick behind classic shaded
+ * terminal art.
  */
-const ROWS = [
-  ' █████╗  █████╗ ██╗  ██╗ █████╗ ███████╗██╗  ██╗',
-  '██╔══██╗██╔══██╗██║ ██╔╝██╔══██╗██╔════╝██║  ██║',
-  '███████║███████║█████╔╝ ███████║███████╗███████║',
-  '██╔══██║██╔══██║██╔═██╗ ██╔══██║╚════██║██╔══██║',
-  '██║  ██║██║  ██║██║  ██╗██║  ██║███████║██║  ██║',
-  '╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝',
-  '        ███████╗██╗  ██╗ █████╗ ██╗  ██╗        ',
-  '        ██╔════╝██║  ██║██╔══██╗██║  ██║        ',
-  '        ███████╗███████║███████║███████║        ',
-  '        ╚════██║██╔══██║██╔══██║██╔══██║        ',
-  '        ███████║██║  ██║██║  ██║██║  ██║        ',
-  '        ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝        ',
-];
 
-/** A horizontal run of solid cells: x/y are grid cells, w is a cell count. */
-export type Run = { x: number; y: number; w: number };
-
-function parse(rows: string[]): Run[] {
-  const runs: Run[] = [];
-  rows.forEach((row, y) => {
-    let x = 0;
-    while (x < row.length) {
-      if (row[x] !== '█') {
-        x += 1;
-        continue;
-      }
-      let w = 0;
-      while (row[x + w] === '█') w += 1;
-      runs.push({ x, y, w });
-      x += w;
-    }
-  });
-  return runs;
+/** Cowsay-style speech bubble around a single line of text. */
+export function bubble(text: string): string[] {
+  const w = text.length + 2;
+  return [` ${'_'.repeat(w)}`, `< ${text} >`, ` ${'-'.repeat(w)}`];
 }
 
-/** Only the solid blocks, with fully blank trailing rows dropped. */
-const SOLID_ROWS = (() => {
-  const stripped = ROWS.map((r) => r.replace(/[^█]/g, ' '));
-  let end = stripped.length;
-  while (end > 0 && stripped[end - 1].trim() === '') end -= 1;
-  return stripped.slice(0, end);
-})();
+/** Shaded mascot. */
+export const MASCOT: string[] = [
+  '               :#$~',
+  '               .WW.',
+  '     .!WWWWWWWWXW#XWWWWWWWW!.',
+  '    .$$$$$$$$$$$$$$$$$$$$$$$$.',
+  '    :$$$#:   :W$$$$W:   :#$$$:',
+  '    .$$$!     .$$$$:     ~$$$:',
+  '    .$$$$X~:~X$$$$$$X~:~X$$$$:',
+  '    .$$$$$$$!!~~~~~~!!#$$$$$$:',
+  '     X$$$$$#~~~~~~~~~~#$$$$$W',
+  '      .::~~~~~~~~~~~~~~~~::.',
+  '        XWWWWWWWWWWWWWWWWX',
+  '       !$$$$$$$$$$$$$$$$$$!',
+  '       .X################X.',
+];
 
-export const BANNER_RUNS: Run[] = parse(SOLID_ROWS);
+const INDENT = '      ';
 
-export const BANNER_ROWS = SOLID_ROWS.length;
+/** Speech bubble with the given name, tail, then the mascot below it. */
+export function banner(name: string): string[] {
+  return [
+    ...bubble(name),
+    '        \\',
+    '         \\',
+    ...MASCOT.map((row) => INDENT + row),
+  ];
+}
 
-export const BANNER_COLS = BANNER_RUNS.reduce((max, r) => Math.max(max, r.x + r.w), 0);
+/** Widest line of a block of art, for sizing the text to fit. */
+export function widthOf(rows: string[]): number {
+  return rows.reduce((max, r) => Math.max(max, r.length), 0);
+}
 
 export const BOOT_LOG = [
   'booting aakash-os v2.1.0 ...',
