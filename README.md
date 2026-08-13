@@ -1,18 +1,18 @@
 # aakashxyz.com
 
-Personal site for **Aakash Shah** — an interactive terminal with neon ASCII name
-art and a keyboard-navigable menu.
+Personal site for **Aakash Shah** — a small terminal that behaves like a real
+one. Unix-style commands, a virtual filesystem, tab completion, history and
+readline key bindings, dressed in macOS/iTerm2 window chrome.
 
 ```
- █████╗  █████╗ ██╗  ██╗ █████╗ ███████╗██╗  ██╗
-██╔══██╗██╔══██╗██║ ██╔╝██╔══██╗██╔════╝██║  ██║
-███████║███████║█████╔╝ ███████║███████╗███████║
-██╔══██║██╔══██║██╔═██╗ ██╔══██║╚════██║██╔══██║
-██║  ██║██║  ██║██║  ██╗██║  ██║███████║██║  ██║
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+            | |               | |           | |          | |
+ __ _  __ _ | | __  __ _  ___ | |__     ___ | |__   __ _ | |__
+/ _` |/ _` || |/ / / _` |/ __|| '_ \   / __|| '_ \ / _` || '_ \
+\__,_|\__,_||_|\_\ \__,_|\__ \|_| |_|  \__ \|_| |_|\__,_||_| |_|
 ```
 
-Stack: Vite + React + TypeScript. No runtime dependencies beyond React.
+Stack: Vite + React + TypeScript. No runtime dependencies beyond React, and no
+webfont — it uses whatever mono font your OS already ships.
 
 ---
 
@@ -32,24 +32,27 @@ npm run preview  # serve the production build
 **Everything you need to edit lives in one file: [`src/data/site.ts`](src/data/site.ts).**
 Look for the `TODO:` markers.
 
-| Export       | What it controls                                       |
-| ------------ | ------------------------------------------------------ |
-| `profile`    | Name, handle, tagline, email, social links, resume path |
-| `menu`       | The arrow-key selectable list                           |
-| `about`      | The `about` section                                     |
-| `experience` | Roles, dates, bullets                                   |
-| `projects`   | Name, blurb, stack, link                                |
-| `skills`     | Grouped skill lists                                     |
+| Export       | Becomes                                                 |
+| ------------ | ------------------------------------------------------- |
+| `profile`    | The prompt, the banner line, `whoami`, `~/resume.pdf`    |
+| `about`      | `~/about.txt`                                            |
+| `experience` | `~/experience/<company>.md` — one file per role          |
+| `projects`   | `~/projects/<slug>.md` — one file per project            |
+| `skills`     | `~/skills.txt`                                           |
+| `contact`    | `~/contact.txt`                                          |
+
+Add a project and a new file appears in the tree automatically — there is no
+second place to register it.
 
 Inside any string you can use:
 
 | Markup                | Renders as        |
 | --------------------- | ----------------- |
 | `**text**`            | bright highlight  |
-| `` `text` ``          | accent chip       |
+| `` `text` ``          | accent colour     |
 | `[label](https://...)`| clickable link    |
 
-Drop a `resume.pdf` into `public/` and the `resume` command will open it.
+Drop a `resume.pdf` into `public/` and `open resume.pdf` will open it.
 
 ### Adding a command
 
@@ -58,29 +61,33 @@ Add an entry to the `registry` array in [`src/lib/commands.ts`](src/lib/commands
 ```ts
 {
   name: 'blog',
+  usage: 'blog',
   desc: 'things i wrote',
-  aliases: ['writing'],
-  run: () => [L('  coming soon.', 'dim'), L()],
+  run: () => [L('coming soon.', 'dim')],
 }
 ```
 
-Set `hidden: true` to keep it out of `help` (good for easter eggs).
+`L(text, colourClass)` is one plain line; `S([...])` is one line built from
+coloured segments, where a segment with `run: 'cat about.txt'` becomes
+clickable. Set `hidden: true` to keep a command out of `help`.
 
 ### Adding a theme
 
-Append to `THEMES` in [`src/lib/themes.ts`](src/lib/themes.ts). It is picked up by
-the `theme` command automatically and persists in `localStorage`.
+Append to `THEMES` in [`src/lib/themes.ts`](src/lib/themes.ts). It is picked up
+by the `theme` command automatically and persists in `localStorage`. Ship the
+full ANSI set — output colours are driven entirely by the active scheme.
 
 ---
 
 ## What visitors can do
 
-- **↑ / ↓** move the menu, **Enter** runs the highlighted item
-- Type any command; **Tab** autocompletes, **↑ / ↓** recall history once you've typed
-- **Ctrl+L** clears, **Ctrl+C** cancels the line
-- `help`, `about`, `experience`, `projects`, `skills`, `contact`, `resume`,
-  `theme <name>`, `banner`, `clear`
-- Hidden: `date`, `echo`, `sudo`, `exit`
+- `ls`, `cd`, `pwd`, `cat`, `tree`, `open` — the filesystem is real enough to
+  explore, and `ls` colours directories blue and links red like a real shell
+- Click any filename in the output to `cd`/`cat`/`open` it
+- **Tab** completes both command names and paths; **↑ / ↓** walk history
+- **Ctrl+A/E/U/K/W** readline editing, **Ctrl+C** cancels, **Ctrl+L** clears
+- `help`, `whoami`, `history`, `theme <name>`, `banner`, `clear`
+- Hidden: `date`, `echo`, `uname`, `man`, `sudo`, `exit`
 
 ---
 

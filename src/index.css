@@ -1,16 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-
 :root {
-  --neon: #00f0ff;
-  --neon-2: #ff2bd6;
-  --neon-3: #a06bff;
-  --text: #d6f7ff;
-  --dim: #5d7f8c;
-  --bg: #05070d;
-  --art: #35efd6;
+  /* Overwritten by applyTheme(); these are the onedark defaults so the first
+     paint is already correct. */
+  --bg: #15181e;
+  --chrome: #22262f;
+  --border: #05070a;
+  --fg: #c3c9d4;
+  --dim: #6b7385;
+  --sel: #3b4456;
+  --red: #e06c75;
+  --green: #98c379;
+  --yellow: #e5c07b;
+  --blue: #61afef;
+  --magenta: #c678dd;
+  --cyan: #56b6c2;
 
-  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
-    'Liberation Mono', monospace;
+  /* The fonts a real terminal actually uses, in the order macOS, Windows and
+     Linux provide them. No webfont: it keeps the first paint instant and every
+     glyph on one advance width. */
+  --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Monaco, 'Cascadia Mono',
+    'Consolas', 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+  --ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
   color-scheme: dark;
 }
@@ -29,30 +38,38 @@ body,
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
+  background: #0b0d12;
+  color: var(--fg);
   font-family: var(--mono);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
 a {
-  color: var(--neon);
-  text-decoration: none;
-  border-bottom: 1px dotted currentcolor;
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 a:hover,
 a:focus-visible {
-  color: var(--neon-2);
-  text-shadow: 0 0 10px currentcolor;
+  color: var(--cyan);
 }
 
 ::selection {
-  background: var(--neon);
-  color: var(--bg);
+  background: var(--sel);
+}
+
+/* Inline markup from src/data/site.ts */
+.hl {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.code {
+  color: var(--yellow);
 }
 
 @media (prefers-reduced-motion: reduce) {

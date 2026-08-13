@@ -1,88 +1,139 @@
+/**
+ * Terminal colour schemes.
+ *
+ * These are real palettes people run in iTerm2, not invented neon. Each one
+ * supplies a background, a foreground and the ANSI colours the output actually
+ * uses, so `theme <name>` recolours everything consistently.
+ */
 export type Theme = {
   name: string;
-  /** primary neon */
-  neon: string;
-  /** secondary neon, used for highlights */
-  neon2: string;
-  /** tertiary accent */
-  neon3: string;
-  /** body text */
-  text: string;
-  /** muted text */
-  dim: string;
-  /** page background */
+  /** Terminal background. */
   bg: string;
-  /** ASCII art colour */
-  art: string;
+  /** Title bar. */
+  chrome: string;
+  /** Window border and title bar hairline. */
+  border: string;
+  /** Default text. */
+  fg: string;
+  /** Muted text: comments, hints, secondary detail. */
+  dim: string;
+  /** Selection highlight. */
+  sel: string;
+  red: string;
+  green: string;
+  yellow: string;
+  blue: string;
+  magenta: string;
+  cyan: string;
+  /** True when the scheme is light, so the chrome can adapt. */
+  light?: boolean;
 };
 
 export const THEMES: Theme[] = [
   {
-    name: 'neon',
-    neon: '#00f0ff',
-    neon2: '#ff2bd6',
-    neon3: '#a06bff',
-    text: '#d6f7ff',
-    dim: '#5d7f8c',
-    bg: '#05070d',
-    art: '#35efd6',
+    name: 'onedark',
+    bg: '#15181e',
+    chrome: '#22262f',
+    border: '#05070a',
+    fg: '#c3c9d4',
+    dim: '#6b7385',
+    sel: '#3b4456',
+    red: '#e06c75',
+    green: '#98c379',
+    yellow: '#e5c07b',
+    blue: '#61afef',
+    magenta: '#c678dd',
+    cyan: '#56b6c2',
   },
   {
-    name: 'matrix',
-    neon: '#39ff14',
-    neon2: '#00ffa3',
-    neon3: '#b6ff6b',
-    text: '#c8ffc0',
-    dim: '#3f7a3a',
-    bg: '#000a03',
-    art: '#39ff14',
+    name: 'nord',
+    bg: '#2e3440',
+    chrome: '#3b4252',
+    border: '#161a21',
+    fg: '#d8dee9',
+    dim: '#7b88a1',
+    sel: '#434c5e',
+    red: '#bf616a',
+    green: '#a3be8c',
+    yellow: '#ebcb8b',
+    blue: '#81a1c1',
+    magenta: '#b48ead',
+    cyan: '#88c0d0',
   },
   {
-    name: 'synthwave',
-    neon: '#ff2bd6',
-    neon2: '#ffb200',
-    neon3: '#7a5cff',
-    text: '#ffd9f4',
-    dim: '#8a5a80',
-    bg: '#12061f',
-    art: '#ff5ce1',
+    name: 'gruvbox',
+    bg: '#1d2021',
+    chrome: '#2c2f30',
+    border: '#0d0f0f',
+    fg: '#d5c4a1',
+    dim: '#7c6f64',
+    sel: '#3c3836',
+    red: '#fb4934',
+    green: '#b8bb26',
+    yellow: '#fabd2f',
+    blue: '#83a598',
+    magenta: '#d3869b',
+    cyan: '#8ec07c',
   },
   {
-    name: 'amber',
-    neon: '#ffb000',
-    neon2: '#ff7a00',
-    neon3: '#ffd980',
-    text: '#ffdda8',
-    dim: '#8a6224',
-    bg: '#0d0700',
-    art: '#ffb000',
+    name: 'solarized',
+    bg: '#002b36',
+    chrome: '#073642',
+    border: '#001b23',
+    fg: '#93a1a1',
+    dim: '#5c737a',
+    sel: '#0b4250',
+    red: '#dc322f',
+    green: '#859900',
+    yellow: '#b58900',
+    blue: '#268bd2',
+    magenta: '#d33682',
+    cyan: '#2aa198',
   },
   {
-    name: 'ice',
-    neon: '#7ad7ff',
-    neon2: '#c9a7ff',
-    neon3: '#ffffff',
-    text: '#e6f6ff',
-    dim: '#5b7891',
-    bg: '#040910',
-    art: '#7ad7ff',
+    name: 'light',
+    bg: '#fdf6e3',
+    chrome: '#e9e1cd',
+    border: '#c7bfab',
+    fg: '#3f5359',
+    dim: '#8a9899',
+    sel: '#e3dac2',
+    red: '#c9302c',
+    green: '#4f7a00',
+    yellow: '#96700a',
+    blue: '#2076b8',
+    magenta: '#c02d73',
+    cyan: '#22867f',
+    light: true,
   },
 ];
 
 export const THEME_NAMES = THEMES.map((t) => t.name);
 
-export function applyTheme(theme: Theme) {
-  const r = document.documentElement;
-  r.style.setProperty('--neon', theme.neon);
-  r.style.setProperty('--neon-2', theme.neon2);
-  r.style.setProperty('--neon-3', theme.neon3);
-  r.style.setProperty('--text', theme.text);
-  r.style.setProperty('--dim', theme.dim);
-  r.style.setProperty('--bg', theme.bg);
-  r.style.setProperty('--art', theme.art);
-  document.body.style.background = theme.bg;
-}
-
 export function findTheme(name: string): Theme | undefined {
   return THEMES.find((t) => t.name === name.toLowerCase());
+}
+
+export function applyTheme(theme: Theme) {
+  const r = document.documentElement;
+  const set = (k: string, v: string) => r.style.setProperty(k, v);
+
+  set('--bg', theme.bg);
+  set('--chrome', theme.chrome);
+  set('--border', theme.border);
+  set('--fg', theme.fg);
+  set('--dim', theme.dim);
+  set('--sel', theme.sel);
+  set('--red', theme.red);
+  set('--green', theme.green);
+  set('--yellow', theme.yellow);
+  set('--blue', theme.blue);
+  set('--magenta', theme.magenta);
+  set('--cyan', theme.cyan);
+
+  r.dataset.appearance = theme.light ? 'light' : 'dark';
+  r.style.colorScheme = theme.light ? 'light' : 'dark';
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme.bg);
 }

@@ -1,302 +1,199 @@
 /* ===========================================================================
-   CRT stage
+   Desktop behind the window
    =========================================================================== */
-.crt {
-  position: relative;
+.desk {
   display: grid;
   place-items: center;
   height: 100dvh;
-  min-height: 100dvh;
-  max-height: 100dvh;
-  padding: clamp(0.4rem, 2vh, 2rem) clamp(0.5rem, 3vw, 2.5rem);
+  padding: clamp(0.5rem, 3vmin, 2.5rem);
   overflow: hidden;
   background:
-    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--neon) 7%, transparent), transparent 60%),
-    radial-gradient(90% 70% at 50% 120%, color-mix(in srgb, var(--neon-2) 9%, transparent), transparent 65%),
-    var(--bg);
+    radial-gradient(90% 70% at 20% 0%, rgb(88 108 150 / 20%), transparent 60%),
+    radial-gradient(80% 70% at 100% 100%, rgb(120 90 150 / 16%), transparent 62%),
+    #0b0d12;
 }
 
-.scanlines {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgb(255 255 255 / 2.2%) 0 1px,
-    transparent 1px 3px
-  );
-  mix-blend-mode: overlay;
-  animation: flicker 5.5s infinite steps(60);
-}
-
-.scanlines::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(120% 120% at 50% 50%, transparent 55%, rgb(0 0 0 / 65%) 100%);
-}
-
-.glow-orb {
-  position: absolute;
-  z-index: 0;
-  width: min(70vw, 720px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, color-mix(in srgb, var(--neon) 22%, transparent), transparent 68%);
-  filter: blur(60px);
-  animation: drift 18s ease-in-out infinite alternate;
-}
-
-@keyframes flicker {
-  0%, 96%, 100% { opacity: 1; }
-  97% { opacity: 0.82; }
-  98% { opacity: 1; }
-  99% { opacity: 0.9; }
-}
-
-@keyframes drift {
-  from { transform: translate3d(-8%, -6%, 0) scale(1); }
-  to { transform: translate3d(8%, 6%, 0) scale(1.12); }
+:root[data-appearance='light'] .desk {
+  background:
+    radial-gradient(90% 70% at 20% 0%, rgb(255 236 200 / 70%), transparent 60%),
+    radial-gradient(80% 70% at 100% 100%, rgb(206 224 226 / 70%), transparent 62%),
+    #dfd8c6;
 }
 
 /* ===========================================================================
-   Terminal window
+   Window
    =========================================================================== */
-.terminal {
-  position: relative;
-  z-index: 2;
+.win {
   display: flex;
-  container-type: size;
   flex-direction: column;
-  width: min(100%, 960px);
-  height: min(100%, 760px);
-  max-height: 100%;
+  width: min(100%, 840px);
+  height: min(100%, 540px);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--neon) 45%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--bg) 82%, #000);
+  border-radius: 10px;
+  background: var(--bg);
   box-shadow:
-    0 0 0 1px rgb(0 0 0 / 60%),
-    0 0 28px color-mix(in srgb, var(--neon) 28%, transparent),
-    0 0 90px color-mix(in srgb, var(--neon-2) 16%, transparent),
-    inset 0 0 70px rgb(0 0 0 / 70%);
-  backdrop-filter: blur(3px);
+    0 0 0 0.5px var(--border),
+    0 1px 1px rgb(0 0 0 / 20%),
+    0 18px 50px rgb(0 0 0 / 45%),
+    0 40px 90px rgb(0 0 0 / 28%);
 }
 
-.titlebar {
+/* ===========================================================================
+   Title bar
+   =========================================================================== */
+.bar {
+  position: relative;
   display: flex;
   flex: 0 0 auto;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border-bottom: 0.5px solid var(--border);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--chrome) 88%, #fff 12%),
+    var(--chrome)
+  );
+  user-select: none;
+}
+
+.lights {
+  display: flex;
   gap: 8px;
   align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid color-mix(in srgb, var(--neon) 22%, transparent);
-  background: color-mix(in srgb, var(--neon) 6%, transparent);
 }
 
-.dot {
-  width: 11px;
-  height: 11px;
+.light {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  opacity: 0.85;
+  box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 18%);
 }
 
-.dot-r { background: #ff5f57; }
-.dot-y { background: #febc2e; }
-.dot-g { background: #28c840; }
+.close { background: #ff5f57; }
+.min { background: #febc2e; }
+.max { background: #28c840; }
 
-.title {
-  flex: 1;
-  color: var(--dim);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
+.bar-title {
+  position: absolute;
+  right: 0;
+  left: 0;
+  color: color-mix(in srgb, var(--fg) 72%, transparent);
+  font-family: var(--ui);
+  font-size: 12px;
+  letter-spacing: 0.01em;
   text-align: center;
+  pointer-events: none;
 }
 
 /* ===========================================================================
    Screen
    =========================================================================== */
 .screen {
+  container-type: inline-size;
   flex: 1 1 auto;
   min-height: 0;
-  padding: clamp(0.55rem, 1.7cqh, 1.6rem) clamp(0.9rem, 2.5vw, 1.6rem);
-  /* Scale the whole readout with the terminal's height so the boot output
-     still fits on short laptop screens instead of scrolling the name away. */
-  font-size: clamp(11.5px, 2.05cqh, 15px);
+  padding: 8px 12px 10px;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--neon) 45%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--fg) 22%, transparent) transparent;
+  font-variant-ligatures: none;
+  cursor: text;
 }
 
-.screen::-webkit-scrollbar { width: 8px; }
+.screen::-webkit-scrollbar { width: 9px; }
 .screen::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
   border-radius: 99px;
-  background: color-mix(in srgb, var(--neon) 40%, transparent);
+  background: color-mix(in srgb, var(--fg) 25%, transparent);
+  background-clip: content-box;
 }
 
-.line {
-  min-height: 1.55em;
+/* Ten characters used only to measure the cell size for the title bar. */
+.cell-probe {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre;
+  pointer-events: none;
+}
+
+.row {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  animation: appear 0.16s ease-out both;
+  min-height: 1.4em;
 }
 
-@keyframes appear {
-  from { opacity: 0; transform: translateY(2px); }
-  to { opacity: 1; transform: none; }
+/* The wordmark must never wrap or it shears apart, so instead of wrapping it
+   shrinks: 64 columns at a ~0.62em advance need ~40x the font size in width. */
+.row.art {
+  white-space: pre;
+  overflow-wrap: normal;
+  font-size: min(13px, calc(100cqw / 40));
+  line-height: 1.32;
+  min-height: 0;
 }
 
-.dim { color: var(--dim); }
-.err { color: #ff5f7a; text-shadow: 0 0 12px rgb(255 95 122 / 55%); }
-.rule { color: color-mix(in srgb, var(--neon) 75%, transparent); letter-spacing: 0.06em; }
-.row { color: var(--text); }
-.hl-line { color: var(--neon); font-weight: 700; text-shadow: 0 0 12px currentcolor; }
-.accent-line { color: var(--neon-2); text-shadow: 0 0 12px color-mix(in srgb, var(--neon-2) 60%, transparent); }
-.boot-ok { color: var(--dim); }
-.boot-ok::first-line { color: var(--neon); }
-.echo { color: color-mix(in srgb, var(--text) 70%, transparent); }
-
-.hl { color: var(--neon); font-weight: 700; text-shadow: 0 0 12px currentcolor; }
-.code {
-  padding: 0 0.35em;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--neon) 12%, transparent);
-  color: var(--neon-3);
-}
+.seg { white-space: pre-wrap; }
 
 /* ===========================================================================
-   ASCII art — real monospace text, the way a terminal would print it.
-   Only printable ASCII is used, so every glyph shares one advance width and
-   the grid cannot drift (block-drawing characters are missing from many web
-   font subsets and fall back to a face with different metrics).
+   ANSI colours
+
+   The button reset comes first so the colour and weight utilities below win on
+   source order; both have the same specificity.
    =========================================================================== */
-.ascii {
-  margin: 0;
-  padding: 0.55rem 0 0.45rem;
-  /* Three caps: a readable maximum, one that keeps --cols columns inside the
-     terminal's width, and one that keeps the whole block inside its height.
-     Without the height cap the screen scrolls and the name is hidden. */
-  font-size: min(0.8rem, calc(92cqw * 1.62 / var(--cols)), 1.95cqh);
-  line-height: 1.02;
-  white-space: pre;
-  color: var(--art);
-  text-shadow: 0 0 9px color-mix(in srgb, var(--art) 60%, transparent);
-  animation: bootin 0.7s ease-out both;
-}
 
-@supports not (container-type: size) {
-  .screen { padding: clamp(0.55rem, 1.6vh, 1.6rem) clamp(0.9rem, 2.5vw, 1.6rem); font-size: clamp(11.5px, 1.9vh, 15px); }
-  .ascii { font-size: min(0.8rem, calc(92vw * 1.62 / var(--cols)), 1.9vh); }
-}
-
-@keyframes bootin {
-  from { opacity: 0; transform: scaleY(1.2); }
-  to { opacity: 1; transform: none; }
-}
-
-/* ===========================================================================
-   Selection menu
-   =========================================================================== */
-.menu {
-  margin: 0.4rem 0 0.7rem;
-  color: color-mix(in srgb, var(--neon) 70%, transparent);
-}
-
-.menu-top,
-.menu-bot {
-  white-space: pre;
-  overflow: hidden;
-  letter-spacing: 0.04em;
-}
-
-.menu-item {
-  display: flex;
-  gap: 0.75ch;
-  align-items: baseline;
-  width: 100%;
-  padding: 1px 0 1px 1ch;
+/* Clickable output: looks like plain text until you point at it, the same way
+   iTerm2 only reveals a path is actionable on hover. */
+.link {
+  padding: 0;
   border: 0;
-  border-left: 2px solid transparent;
+  border-radius: 2px;
   background: none;
-  color: var(--text);
+  color: inherit;
   font: inherit;
-  text-align: left;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
 }
 
-.menu-item .caretmark { width: 1ch; color: var(--neon); white-space: pre; }
-.menu-item .key { color: var(--dim); }
-.menu-item .label { min-width: 12ch; }
-.menu-item .hint { color: var(--dim); font-size: 0.92em; }
-
-.menu-item.is-active {
-  border-left-color: var(--neon);
-  background: color-mix(in srgb, var(--neon) 12%, transparent);
+.link:hover,
+.link:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.menu-item.is-active .label {
-  color: var(--neon);
-  font-weight: 700;
-  text-shadow: 0 0 12px currentcolor;
-}
-
-.menu-item.is-active .caretmark {
-  text-shadow: 0 0 12px currentcolor;
-  animation: nudge 1s ease-in-out infinite;
-}
-
-.menu-item:focus-visible {
-  outline: 1px dashed var(--neon);
-  outline-offset: -1px;
-}
-
-@keyframes nudge {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(2px); }
-}
+.fg { color: var(--fg); }
+.dim { color: var(--dim); }
+.red { color: var(--red); }
+.green { color: var(--green); }
+.yellow { color: var(--yellow); }
+.blue { color: var(--blue); }
+.magenta { color: var(--magenta); }
+.cyan { color: var(--cyan); }
+.bold { font-weight: 700; }
 
 /* ===========================================================================
    Prompt
    =========================================================================== */
-.promptline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.6ch;
-  padding-bottom: 0.5rem;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
+.prompt { display: block; }
 
-.ps1 { flex: 0 0 auto; }
-.ps1-user { color: var(--neon); font-weight: 700; }
-.ps1-at,
-.ps1-path { color: var(--dim); }
-.ps1-host { color: var(--neon-2); }
-
-.typed { color: var(--text); }
-
-.caret {
+.cursor {
   display: inline-block;
-  width: 0.6em;
-  height: 1.05em;
-  translate: -0.5ch 0.15em;
-  background: var(--neon);
-  box-shadow: 0 0 10px var(--neon);
-  animation: blink 1.05s steps(2, start) infinite;
+  min-width: 1ch;
+  background: var(--fg);
+  color: var(--bg);
+  white-space: pre;
+  animation: blink 1.06s step-end infinite;
 }
 
 @keyframes blink {
-  to { visibility: hidden; }
+  0%, 45% { background: var(--fg); color: var(--bg); }
+  46%, 100% { background: transparent; color: inherit; }
 }
 
-.boot-hint { opacity: 0.6; }
-
-/* Keeps a real input in the DOM so mobile keyboards open, without showing it. */
-.hidden-input {
+/* Real input, kept in the DOM so mobile keyboards open and native editing,
+   selection and IME all keep working. It is never visible. */
+.capture {
   position: fixed;
   top: 50%;
   left: 0;
@@ -311,30 +208,17 @@
 }
 
 /* ===========================================================================
-   Small screens
+   Small screens: fill the viewport like a full-screen terminal
    =========================================================================== */
-@media (width <= 620px) {
-  body { font-size: 13px; }
+@media (width <= 640px) {
+  .desk { padding: 0; }
 
-  .crt { padding: 0; }
-
-  .terminal {
+  .win {
     width: 100%;
     height: 100dvh;
-    border: 0;
     border-radius: 0;
+    box-shadow: none;
   }
 
-  .title { display: none; }
-
-  /* On phones the terminal is tall but narrow, so size the text from the
-     width - a height-driven size resolves far too large here. */
-  .screen { font-size: clamp(11.5px, 3.4cqw, 13.5px); }
-
-  /* Keep each menu row on one line - wrapping the hint underneath doubled the
-     menu's height and pushed the prompt off small screens. */
-  .ascii { font-size: min(0.72rem, calc(96cqw * 1.62 / var(--cols)), 1.85cqh); }
-  .menu { margin: 0.3rem 0 0.6rem; }
-  .menu-item .label { min-width: 9ch; }
-  .menu-item .hint { font-size: 0.86em; }
+  .screen { padding: 8px 10px 12px; }
 }

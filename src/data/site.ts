@@ -3,6 +3,9 @@
  *  EDIT THIS FILE TO UPDATE YOUR SITE. Nothing else needs to change.
  * ============================================================================
  *
+ *  Everything here becomes a file in the terminal's virtual filesystem, so
+ *  adding a project adds ~/projects/<slug>.md that visitors can `ls` and `cat`.
+ *
  *  Tiny markup you can use inside any string below:
  *    **bold**              -> bright highlight
  *    `code`                -> accent color
@@ -24,15 +27,6 @@ export const profile = {
   ],
   resumeUrl: '/resume.pdf',
 };
-
-/** The arrow-key selectable menu. `cmd` must match a command name. */
-export const menu = [
-  { cmd: 'about', label: 'about', hint: 'who i am' },
-  { cmd: 'experience', label: 'experience', hint: "where i've worked" },
-  { cmd: 'projects', label: 'projects', hint: "what i've built" },
-  { cmd: 'skills', label: 'skills', hint: 'what i work with' },
-  { cmd: 'contact', label: 'contact', hint: 'say hello' },
-];
 
 // ---------------------------------------------------------------------------
 // ABOUT  — TODO: replace with your real bio
@@ -104,6 +98,16 @@ export const projects: Project[] = [
     blurb: 'TODO: one punchy sentence about what it does.',
     stack: ['TODO'],
   },
+];
+
+// ---------------------------------------------------------------------------
+// CONTACT — shown by `cat contact.txt`
+// ---------------------------------------------------------------------------
+export const contact: string[] = [
+  `email      [${profile.email}](mailto:${profile.email})`,
+  ...profile.socials.map((s) => `${s.label.toLowerCase().padEnd(10)} [${s.url}](${s.url})`),
+  '',
+  `based in ${profile.location}. always up for a good problem.`,
 ];
 
 // ---------------------------------------------------------------------------
