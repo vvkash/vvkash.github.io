@@ -33,9 +33,9 @@ export const S = (segs: Seg[], c?: string): Out => ({ segs, c });
  */
 /**
  * Art rows carry their colour as explicit segments so they never reach the
- * inline markup parser, which would otherwise try to read the block glyphs as
- * formatting. The `art` class is what pins line-height to 1 so the half blocks
- * tile into solid strokes.
+ * inline markup parser, which would otherwise be free to read stray backticks
+ * or brackets in the art as formatting. The `art` class is what pins
+ * line-height to 1 so the figlet stems join up across rows.
  */
 const art = (t: string): Out => S([{ t, c: 'cyan' }], 'art');
 

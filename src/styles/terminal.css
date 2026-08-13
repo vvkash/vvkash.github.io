@@ -141,12 +141,13 @@
    shrinks. --art-cols is fed from WORDMARK_COLS so the two can't drift; 0.62em
    is a safe upper bound on the advance width across the mono stack.
 
-   line-height MUST stay at 1. The art is drawn with half-block glyphs whose ink
-   spans 1.17em, so any taller line opens a seam through every stroke. */
+   line-height MUST stay at 1. The figlet letterforms are held together by |
+   stems running down consecutive rows, and any extra leading breaks every stem
+   into dashes - which is exactly what made the old wordmark unreadable. */
 .row.art {
   white-space: pre;
   overflow-wrap: normal;
-  font-size: min(11px, calc(100cqw / var(--art-cols, 62) / 0.62));
+  font-size: min(12px, calc(100cqw / var(--art-cols, 89) / 0.62));
   line-height: 1;
   min-height: 0;
 }

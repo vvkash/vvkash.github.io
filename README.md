@@ -120,15 +120,15 @@ command of that name, and tab completion for free.
 python scripts\wordmark.py
 ```
 
-The letters are a 5×7 bitmap font packed two pixel rows per line with the
-half-block glyphs `▀ ▄ █`, which is what fits a legible face into four terminal
-rows.
+It's the classic figlet "standard" face, uppercase, with one blank column
+between letters.
 
-Two things keep it from falling apart, both of which are easy to undo by
-accident:
+Three things keep it readable, and all three are easy to undo by accident:
 
-- **`.row.art` must keep `line-height: 1`.** A full block's ink spans 1.17em, so
-  a taller line opens a seam straight through every stroke.
+- **`.row.art` must keep `line-height: 1`.** The letterforms are held together
+  by `|` stems running down consecutive rows, and any extra leading breaks every
+  stem into dashes. This is what made an earlier version hard to read.
+- **One blank column between letters.** Without it neighbouring stems collide.
 - **The art must not wrap.** `--art-cols` is fed from `WORDMARK_COLS`, so the
   art shrinks to fit narrow screens instead of shearing apart.
 
