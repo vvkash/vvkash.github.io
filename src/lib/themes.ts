@@ -30,6 +30,26 @@ export type Theme = {
 };
 
 export const THEMES: Theme[] = [
+  /**
+   * The default: a plain black terminal with white text and a green prompt,
+   * the way a fresh shell looks before anyone themes it. Green is the only
+   * loud colour; everything else stays out of the way.
+   */
+  {
+    name: 'classic',
+    bg: '#000000',
+    chrome: '#131313',
+    border: '#2b2b2b',
+    fg: '#ffffff',
+    dim: '#767676',
+    sel: '#2c3a30',
+    red: '#ff6b6b',
+    green: '#3ddc6b',
+    yellow: '#e8d16a',
+    blue: '#6cb6ff',
+    magenta: '#d78ee8',
+    cyan: '#5fd7d7',
+  },
   {
     name: 'onedark',
     bg: '#15181e',

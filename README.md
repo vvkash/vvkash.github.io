@@ -132,6 +132,22 @@ Three things keep it readable, and all three are easy to undo by accident:
 - **The art must not wrap.** `--art-cols` is fed from `WORDMARK_COLS`, so the
   art shrinks to fit narrow screens instead of shearing apart.
 
+The leftward tilt is `transform: skewX(var(--art-lean))` on `.row.art`; change
+`--art-lean` in [`src/styles/terminal.css`](src/styles/terminal.css) to lean it
+more or less, or set it to `0deg` for none. This is also why `bannerRow()` emits
+the wordmark as a **single** row holding newlines rather than five separate
+rows: one shear over the whole block stays continuous, whereas skewing five
+rows would offset each one sideways and staircase the stems.
+
+### Changing the colours
+
+`theme <name>` switches between the schemes in
+[`src/lib/themes.ts`](src/lib/themes.ts) and remembers your choice.
+`THEMES[0]` is the default — currently `classic`: black background, white text,
+green prompt and menu. The `:root` block in
+[`src/index.css`](src/index.css) mirrors it so the very first paint is already
+right; change one and change the other.
+
 ---
 
 ## Deploying to aakashxyz.com

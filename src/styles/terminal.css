@@ -8,9 +8,9 @@
   padding: clamp(0.5rem, 3vmin, 2.5rem);
   overflow: hidden;
   background:
-    radial-gradient(90% 70% at 20% 0%, rgb(88 108 150 / 20%), transparent 60%),
-    radial-gradient(80% 70% at 100% 100%, rgb(120 90 150 / 16%), transparent 62%),
-    #0b0d12;
+    radial-gradient(90% 70% at 20% 0%, rgb(120 120 120 / 12%), transparent 60%),
+    radial-gradient(80% 70% at 100% 100%, rgb(90 90 90 / 10%), transparent 62%),
+    #0a0a0a;
 }
 
 :root[data-appearance='light'] .desk {
@@ -138,19 +138,30 @@
 }
 
 /* The wordmark must never wrap or it shears apart, so instead of wrapping it
-   shrinks. --art-cols is fed from WORDMARK_COLS so the two can't drift; 0.62em
-   is a safe upper bound on the advance width across the mono stack.
+   shrinks. --art-cols is fed from WORDMARK_COLS so the two can't drift; 0.64em
+   is a safe upper bound on the advance width across the mono stack, with a
+   little slack left for the lean below.
 
    line-height MUST stay at 1. The figlet letterforms are held together by |
    stems running down consecutive rows, and any extra leading breaks every stem
-   into dashes - which is exactly what made the old wordmark unreadable. */
+   into dashes - which is exactly what made the old wordmark unreadable.
+
+   The lean is one shear over the whole block. That is why bannerRow() emits the
+   wordmark as a single row holding newlines: skewing five separate rows would
+   offset each one sideways instead, stepping the stems into a staircase. The
+   origin sits at the left middle so the tilt stays centred on the text rather
+   than pushing the whole name sideways. */
 .row.art {
   white-space: pre;
   overflow-wrap: normal;
-  font-size: min(12px, calc(100cqw / var(--art-cols, 89) / 0.62));
+  font-size: min(12px, calc(100cqw / var(--art-cols, 89) / 0.64));
   line-height: 1;
   min-height: 0;
+  transform: skewX(var(--art-lean, 9deg));
+  transform-origin: 0 50%;
 }
+
+.row.art .seg { white-space: pre; }
 
 .seg { white-space: pre-wrap; }
 

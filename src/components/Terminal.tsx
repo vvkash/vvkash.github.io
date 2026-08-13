@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
+  bannerRow,
   bannerRows,
   complete,
   findCommand,
   identityRow,
   menu,
   menuHeader,
+  WORDMARK_ROWS,
   type CommandCtx,
   type Out,
   type Seg,
@@ -241,8 +243,16 @@ export default function Terminal() {
 
     emit([{ t: `Last login: ${b.stamp} on ttys000`, c: 'dim' }, {}]);
 
-    // The wordmark draws itself a row at a time, like a slow tty.
-    bannerRows().forEach((row, i) => at(160 + i * 70, () => emit([row])));
+    // The wordmark draws itself a row at a time, like a slow tty. It is one
+    // row rewritten in place rather than five rows, so the CSS lean applies as
+    // a single unbroken shear.
+    let artId = 0;
+    at(160, () => {
+      artId = emitLive(bannerRow(1));
+    });
+    for (let i = 2; i <= WORDMARK_ROWS; i++) {
+      at(160 + (i - 1) * 70, () => rewrite(artId, bannerRow(i)));
+    }
 
     at(520, () => emit([{}, identityRow()]));
 
@@ -251,7 +261,7 @@ export default function Terminal() {
       const spinnerRow = (f: number): Out => ({
         segs: [
           { t: '  ' },
-          { t: SPINNER[f % SPINNER.length], c: 'cyan' },
+          { t: SPINNER[f % SPINNER.length], c: 'green' },
           { t: '  loading sections', c: 'dim' },
         ],
       });

@@ -28,16 +28,12 @@ export const L = (t = '', c?: string): Out => ({ t, c });
 export const S = (segs: Seg[], c?: string): Out => ({ segs, c });
 
 /**
- * Art rows must skip the inline markup parser: the wordmark contains backticks
- * and asterisks that would otherwise be eaten as formatting.
- */
-/**
  * Art rows carry their colour as explicit segments so they never reach the
  * inline markup parser, which would otherwise be free to read stray backticks
- * or brackets in the art as formatting. The `art` class is what pins
- * line-height to 1 so the figlet stems join up across rows.
+ * or brackets in the art as formatting. The `art` class pins line-height to 1
+ * so the figlet stems join up across rows, and applies the lean.
  */
-const art = (t: string): Out => S([{ t, c: 'cyan' }], 'art');
+const art = (t: string): Out => S([{ t, c: 'fg' }], 'art');
 
 export type CommandCtx = {
   cwd: string;
@@ -109,7 +105,9 @@ function readSection(path: string): Out[] {
   if (!node) return err(`${path}: No such file or directory`);
   if (!isDir(node)) return node.lines.map((l) => L(l));
 
-  const files = sortedChildren(node).filter((c): c is FsFile => !isDir(c));
+  // Declaration order, not `ls` order: site.ts lists roles newest first and
+  // that is the order they should be read in.
+  const files = node.children.filter((c): c is FsFile => !isDir(c));
   return files.flatMap((f, i) => [...(i ? [L()] : []), ...f.lines.map((l) => L(l))]);
 }
 
@@ -121,7 +119,7 @@ export function menu(): Out[] {
     ...SECTIONS.map((s, i) =>
       S([
         { t: `  ${i + 1}  `, c: 'dim' },
-        { t: s.name.padEnd(pad), c: 'cyan', run: s.name },
+        { t: s.name.padEnd(pad), c: 'green', run: s.name },
         { t: '   ' },
         { t: s.hint, c: 'dim' },
       ]),
@@ -334,7 +332,7 @@ const registry: Command[] = [
           S([
             { t: 'usage: theme <name>   ', c: 'dim' },
             ...THEME_NAMES.flatMap((n): Seg[] => [
-              { t: n, c: 'cyan', run: `theme ${n}` },
+              { t: n, c: 'green', run: `theme ${n}` },
               { t: '  ' },
             ]),
           ]),
@@ -365,7 +363,7 @@ const registry: Command[] = [
     name: 'banner',
     usage: 'banner',
     desc: 'print the name again',
-    run: () => WORDMARK.map(art),
+    run: () => bannerRows(),
   },
 
   {
@@ -500,9 +498,21 @@ export function complete(input: string, cwd: string): { value: string; matches: 
   return { value, matches: candidates.length > 1 ? candidates : [] };
 }
 
+/** How many text rows the wordmark occupies. */
+export const WORDMARK_ROWS = WORDMARK.length;
+
+/**
+ * The wordmark as a *single* row holding newlines, so the CSS shear that
+ * tilts it stays continuous instead of stepping row by row. Pass `lines` to
+ * get a partial wordmark, which is how the boot draws it a row at a time.
+ */
+export function bannerRow(lines: number = WORDMARK_ROWS): Out {
+  return art(WORDMARK.slice(0, lines).join('\n'));
+}
+
 /** The wordmark, as output rows. */
 export function bannerRows(): Out[] {
-  return WORDMARK.map(art);
+  return [bannerRow()];
 }
 
 /** Tagline and location, on one line. */

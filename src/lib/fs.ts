@@ -37,7 +37,7 @@ function jobFile(job: (typeof experience)[number]): FsFile {
     lines: [
       `**${job.role}**`,
       `${job.company}${job.location ? ` · ${job.location}` : ''}`,
-      job.period,
+      ...(job.period ? [job.period] : []),
       '',
       ...job.bullets.map((b) => `- ${b}`),
     ],
