@@ -66,7 +66,7 @@ export const experience: Job[] = [
     period: 'Jun 2026 — Aug 2026',
     location: 'Redmond, WA',
     summary: [
-      'On the Data Galaxy team, building the `pipelines` that pull failure signals out of 200+ production data flows — and the `prediction engine` that calls incidents about a day before they land.',
+      'On the Data Galaxy team. Built the `pipelines` that pull failure signals out of 200+ production data flows, then the `prediction engine` on top — `PyTorch` and `TensorFlow` in Python, forecasting anomalies up to `48 hours` in advance.',
     ],
   },
   {
@@ -91,7 +91,7 @@ export const experience: Job[] = [
   {
     company: 'AI4Health',
     org: 'Mobile Security Research',
-    role: 'Undergraduate Researcher',
+    role: 'Android ML Researcher',
     period: 'Mar 2026 — Aug 2026',
     location: 'UNC Charlotte',
     summary: [
@@ -203,7 +203,7 @@ export const skills: { group: string; items: string[] }[] = [
     group: 'languages',
     items: ['Python', 'Go', 'Swift', 'TypeScript', 'Kotlin', 'C++', 'Java'],
   },
-  { group: 'ml + ai', items: ['PyTorch', 'LightGBM', 'CoreML', 'embeddings', 'NLP'] },
+  { group: 'ml + ai', items: ['PyTorch', 'TensorFlow', 'LightGBM', 'CoreML', 'embeddings', 'NLP'] },
   { group: 'backend', items: ['FastAPI', 'Flask', 'Express', 'GraphQL', 'PostgreSQL', 'MongoDB'] },
   { group: 'mobile', items: ['SwiftUI', 'Jetpack Compose', 'ARKit', 'visionOS'] },
   { group: 'cloud', items: ['Azure', 'AWS', 'Docker'] },
