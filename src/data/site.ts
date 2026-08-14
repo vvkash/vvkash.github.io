@@ -32,6 +32,31 @@ export const profile = {
 };
 
 // ---------------------------------------------------------------------------
+// NOW PLAYING  —  the little record in the bottom right corner
+// ---------------------------------------------------------------------------
+/**
+ * `art` and `preview` point at Spotify's own CDN rather than at files in this
+ * repo, so no album art or audio is ever redistributed here and both stay
+ * whatever Spotify currently serves. `preview` is the 30 second clip Spotify
+ * publishes for a track; if it ever stops resolving the widget notices and
+ * quietly turns into a link to the song instead of breaking.
+ *
+ * To change the song: copy its Spotify link and run
+ *
+ *     node scripts/nowplaying.mjs <link>
+ *
+ * then paste what it prints over the object below.
+ */
+export const nowPlaying = {
+  label: 'favorite song rn',
+  title: 'Voraz',
+  artist: 'yaego, wzrdd, skrta',
+  url: 'https://open.spotify.com/track/6plFovfD8ciYHHKobwAnnI',
+  art: 'https://i.scdn.co/image/ab67616d0000b27315de121654e8591de4a64a32',
+  preview: 'https://p.scdn.co/mp3-preview/2744b1bbdf09f3671402f84b8d8afcd9e510b233',
+};
+
+// ---------------------------------------------------------------------------
 // ABOUT
 // ---------------------------------------------------------------------------
 export const about: string[] = [

@@ -18,6 +18,7 @@ import { applyTheme, findTheme, THEMES } from '../lib/themes';
 import { WORDMARK_COLS } from '../lib/ascii';
 import { profile } from '../data/site';
 import { Inline } from './Inline';
+import NowPlaying from './NowPlaying';
 import '../styles/terminal.css';
 
 type Row = Out & { id: number };
@@ -532,6 +533,12 @@ export default function Terminal() {
           )}
         </div>
       </main>
+
+      {/* Inside .desk on purpose: the mouse-up handler above hands focus back
+          to the terminal after a click here, so playing the record never leaves
+          you typing into nothing. Keyboard activation fires no mouse-up, so tab
+          order is left alone. */}
+      <NowPlaying ready={!busy} />
 
       <input
         aria-label="Terminal input"

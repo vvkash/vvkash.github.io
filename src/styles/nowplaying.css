@@ -1,0 +1,307 @@
+/* ===========================================================================
+   Now playing — a small record sitting on the desk next to the window
+
+   Everything here is driven by the theme variables, so it follows `theme
+   <name>` along with the rest of the site. The vinyl itself stays black in
+   every scheme, because records are.
+   =========================================================================== */
+.np {
+  --disc: 54px;
+
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 20;
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  max-width: calc(100vw - 40px);
+  padding: 9px 15px 9px 9px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--chrome) 78%, transparent);
+  box-shadow:
+    0 0 0 0.5px var(--border),
+    0 12px 34px rgb(0 0 0 / 45%);
+  opacity: 0;
+  transform: translateY(10px);
+
+  /* Held back until the boot sequence finishes so it doesn't compete with the
+     wordmark drawing itself. */
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+  pointer-events: none;
+  backdrop-filter: blur(16px) saturate(130%);
+}
+
+.np-in {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* ---------------------------------------------------------------------------
+   The record
+   --------------------------------------------------------------------------- */
+.np-disc {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--disc);
+  height: var(--disc);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.np-disc:focus-visible {
+  outline: 1.5px solid var(--green);
+  outline-offset: 3px;
+}
+
+/* This is the part that turns. The grooves and the spindle hole are radially
+   symmetric, so only the sleeve in the middle reads as motion — which is what
+   makes a spinning record look like a spinning record. */
+.np-vinyl {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgb(255 255 255 / 6%) 0 0.5px,
+      rgb(0 0 0 / 0%) 0.5px 2px
+    ),
+    radial-gradient(circle at 50% 50%, #262626 0%, #101010 62%, #050505 100%);
+  box-shadow:
+    inset 0 0 0 0.5px rgb(255 255 255 / 14%),
+    0 2px 10px rgb(0 0 0 / 55%);
+  animation: np-spin 3.6s linear infinite;
+  animation-play-state: paused;
+}
+
+.np-on .np-vinyl {
+  animation-play-state: running;
+}
+
+@keyframes np-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* The label in the middle of the record. */
+.np-art {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.5px rgb(0 0 0 / 70%);
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+}
+
+/* Spindle hole, punched through the sleeve. */
+.np-vinyl::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #000;
+  box-shadow: 0 0 0 0.5px rgb(255 255 255 / 28%);
+  transform: translate(-50%, -50%);
+}
+
+/* A reflection belongs to the room, not to the record, so it sits outside the
+   element that spins and stays put while the sleeve turns underneath it. */
+.np-gloss {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    118deg,
+    rgb(255 255 255 / 16%) 0%,
+    rgb(255 255 255 / 0%) 30%,
+    rgb(255 255 255 / 0%) 66%,
+    rgb(255 255 255 / 9%) 100%
+  );
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Play / pause, drawn rather than typed so it doesn't depend on a font having
+   the glyphs. Hidden until you point at the record.
+   --------------------------------------------------------------------------- */
+.np-ctl {
+  position: absolute;
+  display: grid;
+  inset: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 48%);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.np-disc:hover .np-ctl,
+.np-disc:focus-visible .np-ctl {
+  opacity: 1;
+}
+
+.np-play {
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 11px solid #fff;
+}
+
+.np-pause {
+  display: flex;
+  gap: 4px;
+  width: 12px;
+  height: 13px;
+}
+
+.np-pause::before,
+.np-pause::after {
+  content: '';
+  flex: 1;
+  border-radius: 1px;
+  background: #fff;
+}
+
+/* ---------------------------------------------------------------------------
+   Text
+   --------------------------------------------------------------------------- */
+.np-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  max-width: 178px;
+}
+
+.np-line {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.np-label {
+  overflow: hidden;
+  color: var(--green);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.np-time {
+  flex: 0 0 auto;
+  color: var(--dim);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.np-live {
+  color: var(--green);
+}
+
+.np-title,
+.np-artist {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.np-title {
+  color: var(--fg);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+.np-title:hover,
+.np-title:focus-visible {
+  color: var(--fg);
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.np-artist {
+  color: var(--dim);
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+   Progress, along the bottom edge of the card
+   --------------------------------------------------------------------------- */
+.np-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: rgb(255 255 255 / 7%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* Stays up while the clip is paused part way through, so the bar and the timer
+   agree that the position was kept. */
+.np-cued .np-bar {
+  opacity: 1;
+}
+
+.np-fill {
+  display: block;
+  width: calc(var(--p, 0) * 100%);
+  height: 100%;
+  background: var(--green);
+
+  /* timeupdate only fires a few times a second, so the fill is interpolated
+     between the ticks instead of stepping. */
+  transition: width 0.25s linear;
+}
+
+/* ---------------------------------------------------------------------------
+   Small screens: the terminal is full bleed here, so the record shrinks to a
+   sleeve and a title and gets out of the way.
+   --------------------------------------------------------------------------- */
+@media (width <= 640px) {
+  .np {
+    --disc: 38px;
+
+    right: 10px;
+    bottom: 10px;
+    gap: 9px;
+    padding: 7px 12px 7px 7px;
+    border-radius: 10px;
+  }
+
+  .np-line,
+  .np-artist {
+    display: none;
+  }
+
+  .np-meta {
+    max-width: 132px;
+  }
+
+  .np-title {
+    font-size: 12px;
+  }
+}

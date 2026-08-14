@@ -249,5 +249,7 @@
     box-shadow: none;
   }
 
-  .screen { padding: 8px 10px 12px; }
+  /* Bottom padding clears the record in the corner, so the prompt is never
+     sitting underneath it once the screen scrolls to the end. */
+  .screen { padding: 8px 10px 60px; }
 }

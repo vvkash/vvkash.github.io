@@ -114,6 +114,8 @@ straight to the end.
 - **Ctrl+A/E/U/K/W** readline editing, **Ctrl+C** cancels, **Ctrl+L** clears
 - `menu`, `help`, `whoami`, `history`, `theme <name>`, `banner`, `clear`
 - Hidden: `date`, `echo`, `uname`, `man`, `sudo`, `exit`
+- A record sits in the bottom right corner: click it for a 30 second preview of
+  whatever is playing, and the sleeve spins while it does
 
 ### Pages vs shell commands
 
@@ -130,6 +132,26 @@ The menu is the `SECTIONS` array at the top of
 [`src/lib/commands.ts`](src/lib/commands.ts). Each entry is a name, a path into
 the filesystem and a one-line hint; adding one gives you a numbered row, a
 command of that name, and tab completion for free.
+
+### Changing the song
+
+The record in the bottom right plays a 30 second preview of whatever is in
+`nowPlaying` in [`src/data/site.ts`](src/data/site.ts). To swap it, copy the
+track's Spotify link and run:
+
+```powershell
+node scripts\nowplaying.mjs https://open.spotify.com/track/xxxxxxxx
+```
+
+It prints a `nowPlaying` block — paste that over the existing one. Nothing is
+downloaded into the repo: the cover and the audio are hotlinked from Spotify's
+CDN, so no copyrighted files are committed here and both stay whatever Spotify
+currently serves.
+
+Nothing is fetched until someone clicks the record, so an idle visitor pays for
+one image. Spotify has been retiring preview clips, and if this one ever stops
+resolving the widget notices the failure and turns into a plain link to the
+track rather than a button that does nothing.
 
 ### Changing the wordmark
 
